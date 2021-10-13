@@ -57,5 +57,6 @@ ENCHANT_APPLIED: 3
 SPELL_INTERRUPT: 3
 SPELL_DISPEL: 6
 SPELL_DRAIN: 3
+SWING_EXTRA_ATTACKS
 ``````````````````````````````````````````````````````````````
 */

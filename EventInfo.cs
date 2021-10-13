@@ -111,12 +111,6 @@ namespace PandarosWoWLogParser.EventInfo
         public const int Critical = 11;
     }
 
-    public class SPELL_CREATE
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-    }
 
     public class SPELL_INTERRUPT
     {
@@ -126,20 +120,6 @@ namespace PandarosWoWLogParser.EventInfo
         public const int InterruptedSpellId = 11;
         public const int InterruptedSpellName = 12;
         public const int InterruptedSpellSpellSchool = 13;
-    }
-
-    public class SPELL_RESURRECT
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-    }
-
-    public class SPELL_INSTAKILL
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
     }
 
     public class SWING_DAMAGE

@@ -62,7 +62,6 @@ namespace PandarosWoWLogParser.EventInfo
     public class SPELL_MISSED
     {
         public const int MissedType = 9;
-        public const int MissedDamage = 10;
     }
 
     public class SPELL_DAMAGE
@@ -106,48 +105,10 @@ namespace PandarosWoWLogParser.EventInfo
 
     public class SPELL_HEAL 
     {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int TargetGUID = 11;
-        public const int TargetGUIDOwner = 12;
-        public const int TargetHP = 13;
-        public const int TargetMaxHP = 14;
-        public const int TargetAttackPower = 15;
-        public const int TargetSpellPower = 16;
-        public const int TargetResolve = 17;
-        public const int CastSpellResource = 18;
-        public const int CurrentResource = 19;
-        public const int MaxResource = 20;
-        public const int TargetPosX = 21;
-        public const int TargetPosY = 22;
-        public const int TargetItemLvl = 23;
-        public const int HealAmount = 24;
-        public const int Overheal = 25;
-        public const int HealSpellSchool = 26;
-    }
-
-    public class SPELL_PERIODIC_HEAL
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int TargetGUID = 11;
-        public const int TargetGUIDOwner = 12;
-        public const int TargetHP = 13;
-        public const int TargetMaxHP = 14;
-        public const int TargetAttackPower = 15;
-        public const int TargetSpellPower = 16;
-        public const int TargetResolve = 17;
-        public const int CastSpellResource = 18;
-        public const int CurrentResource = 19;
-        public const int MaxResource = 20;
-        public const int TargetPosX = 21;
-        public const int TargetPosY = 22;
-        public const int TargetItemLvl = 23;
-        public const int HealAmount = 24;
-        public const int Overheal = 25;
-        public const int HealSpellSchool = 26;
+        public const int HealAmount = 8;
+        public const int Overhealing = 9;
+        public const int Absorbed = 10;
+        public const int Critical = 11;
     }
 
     public class SPELL_CREATE
@@ -181,30 +142,7 @@ namespace PandarosWoWLogParser.EventInfo
         public const int CastSpellSchool = 10;
     }
 
-    public class RANGE_DAMAGE
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int TargetGUID = 11;
-        public const int TargetGUIDOwner = 12;
-        public const int TargetHP = 13;
-        public const int TargetMaxHP = 14;
-        public const int TargetAttackPower = 15;
-        public const int TargetSpellPower = 16;
-        public const int TargetResolve = 17;
-        public const int CastSpellResource = 18;
-        public const int CurrentResource = 19;
-        public const int MaxResource = 20;
-        public const int TargetPosX = 21;
-        public const int TargetPosY = 22;
-        public const int TargetItemLvl = 23;
-        public const int DamageDone = 24;
-        public const int Overkill = 25;
-        //26 is probably damage spell school
-    }
-
-    public class SWING_DAMAGE //24-30 unknown
+    public class SWING_DAMAGE
     {
         public const int Amount = 6;
         public const int Overkill = 7;
@@ -217,9 +155,9 @@ namespace PandarosWoWLogParser.EventInfo
         public const int Crushing = 14;
     }
 
-    public class SWING_MISSED //9-11 missing
+    public class SWING_MISSED
     {
-        public const int MissedReason = 8;
+        public const int MissedReason = 6;
     }
 
     public class UNIT_DIED
@@ -250,25 +188,17 @@ namespace PandarosWoWLogParser.EventInfo
         public const int EnemyFlags2 = 7;
     }
 
-    public class ENVIRONMENTAL_DAMAGE //22-31 unknown
+    public class ENVIRONMENTAL_DAMAGE
     {
-        public const int EnvironmentalType = 8;
-        public const int Amount = 9;
-        public const int Overkill = 10;
-        public const int School = 11;
-        public const int Resisted = 12;
-        public const int Blocked = 13;
-        public const int Absorbed = 14;
-        public const int Critical = 15;
-        public const int Glancing = 16;
-        public const int Crushing = 17;
+        public const int EnvironmentalType = 6;
+        public const int Amount = 7;
+        public const int Overkill = 8;
+        public const int School = 9;
+        public const int Resisted = 10;
+        public const int Blocked = 11;
+        public const int Absorbed = 12;
+        public const int Critical = 13;
+        public const int Glancing = 14;
+        public const int Crushing = 15;
     }
-
-    public class RANGE_MISSED //12-13 unknown
-    {
-        public const int SpellId = 8;
-        public const int SpellName = 9;
-        public const int SpellSchool = 10;
-        public const int MissedReason = 11;
-    }
-}// namespace CombatLogEvent.EventInfo
+}

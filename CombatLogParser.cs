@@ -25,6 +25,10 @@ namespace PandarosWoWLogParser
         ICombatParser<SpellAuraDose> _spellAuraDose;
         ICombatParser<SpellAuraBrokenSpell> _spellAuraBrokenSpell;
         ICombatParser<SpellMissed> _spellMissedParser;
+        ICombatParser<SwingMissed> _swingMissedParser;
+        ICombatParser<SpellHeal> _spellHealParser;
+        ICombatParser<CombatEventBase> _combatEventParser;
+        ICombatParser<EnviormentalDamage> _enviormentalDamage;
 
         public CombatLogParser(ICombatParser<SpellDamage> spelldamageParser, 
                                ICombatParser<SpellPeriodicDamage> spellPeriodicParser,
@@ -35,6 +39,10 @@ namespace PandarosWoWLogParser
                                ICombatParser<SpellAuraDose> spellAuraDose,
                                ICombatParser<SpellAuraBrokenSpell> spellAuraBrokenSpell,
                                ICombatParser<SpellMissed> spellmissed,
+                               ICombatParser<SwingMissed> swingmissed,
+                               ICombatParser<SpellHeal> spellHeal,
+                               ICombatParser<CombatEventBase> combatEventBase,
+                               ICombatParser<EnviormentalDamage> enviormentalDamage,
                                ICombatParser<SpellEnergize> spellEnergize)
         {
             _spelldamageParser = spelldamageParser;
@@ -47,6 +55,10 @@ namespace PandarosWoWLogParser
             _spellAuraDose = spellAuraDose;
             _spellAuraBrokenSpell = spellAuraBrokenSpell;
             _spellMissedParser = spellmissed;
+            _swingMissedParser = swingmissed;
+            _spellHealParser = spellHeal;
+            _combatEventParser = combatEventBase;
+            _enviormentalDamage = enviormentalDamage;
         }
 
         public void ParseToEnd(string filepath)
@@ -61,6 +73,8 @@ namespace PandarosWoWLogParser
             else
                 throw new FileNotFoundException("Combat Log not found", filepath);
 
+            Dictionary<string, int> unknown = new Dictionary<string, int>();
+
             using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (StreamReader sr = new StreamReader(fs))
@@ -70,10 +84,17 @@ namespace PandarosWoWLogParser
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
-                        CombatEventBase evt = ParseLine(line);
+                        CombatEventBase evt = ParseLine(line, out string evtStr);
 
                         if (evt != null)
                             CombatQueue.Enqueue(evt);
+                        else
+                        {
+                            if (!unknown.TryGetValue(evtStr, out int val))
+                                unknown.Add(evtStr, 1);
+                            else
+                                unknown[evtStr] = val + 1;
+                        }
 
                         long cur = fs.Position;
                         long total = fs.Length;
@@ -86,11 +107,16 @@ namespace PandarosWoWLogParser
                 }
             }
             IsParsing = false;
-
+            Console.WriteLine($"``````````````````````````````````````````````````````````````");
+            Console.WriteLine($"Number of unknown events: {unknown.Count}");
+            Console.WriteLine($"--------------------------------------------------------------");
+            foreach (var ev in unknown)
+                Console.WriteLine($"{ev.Key}: {ev.Value}");
+            Console.WriteLine($"``````````````````````````````````````````````````````````````");
         }
 
 
-        private CombatEventBase ParseLine(string line)
+        private CombatEventBase ParseLine(string line, out string evt)
         {
             Regex r = new Regex(@"(\d{1,2})/(\d{1,2})\s(\d{2}):(\d{2}):(\d{2}).(\d{3})\s\s(\w+),(.+)$"); //matches the date format used in the combat log
             Match m = r.Match(line);
@@ -110,13 +136,13 @@ namespace PandarosWoWLogParser
             string second = collection[5].Value;
             string millisecond = collection[6].Value;
 
-            string evt = collection[7].Value;
+            evt = collection[7].Value;
             string data = collection[8].Value;
 
             DateTime time;
 
             //This should never error, as the date format is expected to be identical every time
-            time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond));
+            time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond)).ToUniversalTime();
 
             return ParseObject(evt, data, time);
 
@@ -129,14 +155,28 @@ namespace PandarosWoWLogParser
                 case LogEvents.SWING_DAMAGE:
                     return _swingDamageParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
+                case LogEvents.SWING_MISSED:
+                    return _swingMissedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.DAMAGE_SHIELD:
                 case LogEvents.SPELL_DAMAGE:
+                case LogEvents.RANGE_DAMAGE:
                     return _spelldamageParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
                 case LogEvents.SPELL_PERIODIC_DAMAGE:
                     return _spellPeriodicParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
+                case LogEvents.ENVIRONMENTAL_DAMAGE:
+                    return _enviormentalDamage.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
                 case LogEvents.SPELL_CAST_START:
                 case LogEvents.SPELL_CAST_SUCCESS:
+                case LogEvents.SPELL_SUMMON:
+                case LogEvents.SPELL_CREATE:
+                case LogEvents.SPELL_RESURRECT:
+                case LogEvents.SPELL_INSTAKILL:
+                case LogEvents.SPELL_DURABILITY_DAMAGE:
+                case LogEvents.SPELL_DURABILITY_DAMAGE_ALL:
                     return _spellParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
                 case LogEvents.SPELL_CAST_FAILED:
@@ -159,8 +199,20 @@ namespace PandarosWoWLogParser
                 case LogEvents.SPELL_AURA_BROKEN_SPELL:
                     return _spellAuraBrokenSpell.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
+                case LogEvents.SPELL_PERIODIC_MISSED:
                 case LogEvents.SPELL_MISSED:
+                case LogEvents.DAMAGE_SHIELD_MISSED:
+                case LogEvents.RANGE_MISSED:
                     return _spellMissedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_HEAL:
+                case LogEvents.SPELL_PERIODIC_HEAL:
+                    return _spellHealParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.PARTY_KILL:
+                case LogEvents.UNIT_DESTROYED:
+                case LogEvents.UNIT_DIED:
+                    return _combatEventParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
                 default:
                     return null;

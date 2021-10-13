@@ -28,13 +28,34 @@ namespace PandarosWoWLogParser
         public const string SPELL_INTERRUPT = "SPELL_INTERRUPT";
         public const string SPELL_RESURRECT = "SPELL_RESURRECT";
         public const string SPELL_INSTAKILL = "SPELL_INSTAKILL";
+        public const string SPELL_DRAIN = "SPELL_DRAIN";
+        public const string SPELL_DURABILITY_DAMAGE = "SPELL_DURABILITY_DAMAGE";
+        public const string SPELL_DURABILITY_DAMAGE_ALL = "SPELL_DURABILITY_DAMAGE_ALL";
+        public const string DAMAGE_SHIELD = "DAMAGE_SHIELD";
+        public const string DAMAGE_SPLIT = "DAMAGE_SPLIT";
+        public const string DAMAGE_SHIELD_MISSED = "DAMAGE_SHIELD_MISSED";
+        public const string SPELL_DISPEL = "SPELL_DISPEL";
         public const string RANGE_DAMAGE = "RANGE_DAMAGE";
+        public const string RANGE_MISSED = "RANGE_MISSED";
         public const string SWING_DAMAGE = "SWING_DAMAGE";
-        public const string SWING_DAMAGE_LANDED = "SWING_DAMAGE_LANDED";
         public const string SWING_MISSED = "SWING_MISSED";
         public const string UNIT_DIED = "UNIT_DIED";
         public const string UNIT_DESTROYED = "UNIT_DESTROYED";
         public const string PARTY_KILL = "PARTY_KILL";
         public const string ENVIRONMENTAL_DAMAGE = "ENVIRONMENTAL_DAMAGE";
+        public const string ENCHANT_REMOVED = "ENCHANT_REMOVED";
+        public const string ENCHANT_APPLIED = "ENCHANT_APPLIED";
     }
 }
+
+/*
+``````````````````````````````````````````````````````````````
+Number of unknown events: 5
+--------------------------------------------------------------
+ENCHANT_REMOVED: 7
+ENCHANT_APPLIED: 3
+SPELL_INTERRUPT: 3
+SPELL_DISPEL: 6
+SPELL_DRAIN: 3
+``````````````````````````````````````````````````````````````
+*/

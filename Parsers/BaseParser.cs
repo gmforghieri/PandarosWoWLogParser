@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Parsers
 {
-    public abstract class BaseParser : ICombatParser<CombatEventBase>
+    public class BaseParser : ICombatParser<CombatEventBase>
     {
         public virtual CombatEventBase Parse(DateTime timestamp, string eventName, string[] eventData)
         {

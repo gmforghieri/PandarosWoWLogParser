@@ -16,7 +16,6 @@ namespace PandarosWoWLogParser.Parsers
         {
             obj = (SpellMissed)base.Parse(timestamp, eventName, eventData, obj);
             obj.MissType = eventData[EventInfo.SPELL_MISSED.MissedType];
-            obj.MissDamage = eventData[EventInfo.SPELL_MISSED.MissedDamage].ToInt();
             return obj;
         }
     }

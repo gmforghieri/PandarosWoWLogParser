@@ -24,6 +24,11 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellAuraDoseParser>().As<ICombatParser<SpellAuraDose>>().SingleInstance();
             builder.RegisterType<SpellAuraBrokenSpellParser>().As<ICombatParser<SpellAuraBrokenSpell>>().SingleInstance();
             builder.RegisterType<SpellMissedParser>().As<ICombatParser<SpellMissed>>().SingleInstance();
+            builder.RegisterType<SwingMissedParser>().As<ICombatParser<SwingMissed>>().SingleInstance();
+            builder.RegisterType<SwingMissedParser>().As<ICombatParser<SwingMissed>>().SingleInstance();
+            builder.RegisterType<SpellHealParser>().As<ICombatParser<SpellHeal>>().SingleInstance();
+            builder.RegisterType<BaseParser>().As<ICombatParser<CombatEventBase>>().SingleInstance();
+            builder.RegisterType<EnviormentalDamageParser>().As<ICombatParser<EnviormentalDamage>>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
 
             var container = builder.Build();
@@ -40,10 +45,10 @@ namespace PandarosWoWLogParser
 
             while (clp.CombatQueue.TryDequeue(out var obj))
             {
-                if (!eventCount.ContainsKey(obj.EventName))
+                if (!eventCount.TryGetValue(obj.EventName, out int val))
                     eventCount[obj.EventName] = 1;
                 else
-                    eventCount[obj.EventName] = eventCount[obj.EventName] + 1;
+                    eventCount[obj.EventName] = val + 1;
             }
 
             foreach (var ev in eventCount)

@@ -15,15 +15,15 @@ namespace PandarosWoWLogParser.Parsers
         public virtual EnviormentalDamage Parse(DateTime timestamp, string eventName, string[] eventData, EnviormentalDamage obj)
         {
             obj = (EnviormentalDamage)base.Parse(timestamp, eventName, eventData, obj);
-            obj.Damage = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Amount].ToInt();
-            obj.Overkill = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Overkill].ToInt();
-            obj.DamageSchool = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.School].ToSpellSchool();
-            obj.Resisted = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Resisted].ToInt();
-            obj.Blocked = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Blocked].ToInt();
-            obj.Absorbed = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Absorbed].ToInt();
-            obj.Critical = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Critical].ToBool();
-            obj.Glancing = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Glancing].ToBool();
-            obj.Crushing = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.Crushing].ToBool();
+            obj.Damage = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Amount].ToInt();
+            obj.Overkill = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Overkill].ToInt();
+            obj.DamageSchool = eventData[Indexes.ENVIRONMENTAL_DAMAGE.School].ToSpellSchool();
+            obj.Resisted = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Resisted].ToInt();
+            obj.Blocked = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Blocked].ToInt();
+            obj.Absorbed = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Absorbed].ToInt();
+            obj.Critical = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Critical].ToBool();
+            obj.Glancing = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Glancing].ToBool();
+            obj.Crushing = eventData[Indexes.ENVIRONMENTAL_DAMAGE.Crushing].ToBool();
             return obj;
         }
     }

@@ -15,8 +15,8 @@ namespace PandarosWoWLogParser.Parsers
         public SpellAuraDose Parse(DateTime timestamp, string eventName, string[] eventData, SpellAuraDose obj)
         {
             obj = (SpellAuraDose)base.Parse(timestamp, eventName, eventData, obj);
-            obj.AuraType = eventData[EventInfo.SPELL_AURA_APPLIED_DOSE.AuraType];
-            obj.AuraDoeseAdded = eventData[EventInfo.SPELL_AURA_APPLIED_DOSE.AuraDosesAdded].ToInt();
+            obj.AuraType = eventData[Indexes.SPELL_AURA_APPLIED_DOSE.AuraType];
+            obj.AuraDoeseAdded = eventData[Indexes.SPELL_AURA_APPLIED_DOSE.AuraDosesAdded].ToInt();
 
             return obj;
         }

@@ -15,7 +15,7 @@ namespace PandarosWoWLogParser.Parsers
         public virtual EnviormentalBase Parse(DateTime timestamp, string eventName, string[] eventData, EnviormentalBase obj)
         {
             obj = (EnviormentalBase)base.Parse(timestamp, eventName, eventData, obj);
-            obj.EnvironmentalType = eventData[EventInfo.ENVIRONMENTAL_DAMAGE.EnvironmentalType];
+            obj.EnvironmentalType = eventData[Indexes.ENVIRONMENTAL_DAMAGE.EnvironmentalType];
             return obj;
         }
     }

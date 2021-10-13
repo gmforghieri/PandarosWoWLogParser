@@ -15,7 +15,7 @@ namespace PandarosWoWLogParser.Parsers
         public SwingMissed Parse(DateTime timestamp, string eventName, string[] eventData, SwingMissed obj)
         {
             obj = (SwingMissed)base.Parse(timestamp, eventName, eventData, obj);
-            obj.MissedReason = eventData[EventInfo.SWING_MISSED.MissedReason];
+            obj.MissedReason = eventData[Indexes.SWING_MISSED.MissedReason];
             return obj;
         }
     }

@@ -15,8 +15,8 @@ namespace PandarosWoWLogParser.Parsers
         public SpellEnergize Parse(DateTime timestamp, string eventName, string[] eventData, SpellEnergize obj)
         {
             obj = (SpellEnergize)base.Parse(timestamp, eventName, eventData, obj);
-            obj.EneryAmount = eventData[EventInfo.SPELL_ENERGIZE.EneryAmount].ToInt();
-            obj.PowerType = eventData[EventInfo.SPELL_ENERGIZE.PowerType].ToPowerType();
+            obj.EneryAmount = eventData[Indexes.SPELL_ENERGIZE.EneryAmount].ToInt();
+            obj.PowerType = eventData[Indexes.SPELL_ENERGIZE.PowerType].ToPowerType();
 
             return obj;
         }

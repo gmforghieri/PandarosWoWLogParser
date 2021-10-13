@@ -15,10 +15,10 @@ namespace PandarosWoWLogParser.Parsers
         public SpellHeal Parse(DateTime timestamp, string eventName, string[] eventData, SpellHeal obj)
         {
             obj = (SpellHeal)base.Parse(timestamp, eventName, eventData, obj);
-            obj.HealAmount = eventData[EventInfo.SPELL_HEAL.HealAmount].ToInt();
-            obj.Overhealing = eventData[EventInfo.SPELL_HEAL.Overhealing].ToInt();
-            obj.Absorbed = eventData[EventInfo.SPELL_HEAL.Absorbed].ToInt();
-            obj.Critical = eventData[EventInfo.SPELL_HEAL.Critical].ToBool();
+            obj.HealAmount = eventData[Indexes.SPELL_HEAL.HealAmount].ToInt();
+            obj.Overhealing = eventData[Indexes.SPELL_HEAL.Overhealing].ToInt();
+            obj.Absorbed = eventData[Indexes.SPELL_HEAL.Absorbed].ToInt();
+            obj.Critical = eventData[Indexes.SPELL_HEAL.Critical].ToBool();
             return obj;
         }
     }

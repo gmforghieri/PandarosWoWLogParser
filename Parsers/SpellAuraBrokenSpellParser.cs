@@ -15,10 +15,10 @@ namespace PandarosWoWLogParser.Parsers
         public SpellAuraBrokenSpell Parse(DateTime timestamp, string eventName, string[] eventData, SpellAuraBrokenSpell obj)
         {
             obj = (SpellAuraBrokenSpell)base.Parse(timestamp, eventName, eventData, obj);
-            obj.ExtraSpellID = eventData[EventInfo.SPELL_AURA_BROKEN_SPELL.ExtraSpellID].ToInt();
-            obj.ExtraSpellName = eventData[EventInfo.SPELL_AURA_BROKEN_SPELL.ExtraSpellName];
-            obj.ExtraSpellSchool = eventData[EventInfo.SPELL_AURA_BROKEN_SPELL.ExtraSchool].ToSpellSchool();
-            obj.AuraType = eventData[EventInfo.SPELL_AURA_BROKEN_SPELL.AuraType];
+            obj.ExtraSpellID = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.ExtraSpellID].ToInt();
+            obj.ExtraSpellName = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.ExtraSpellName];
+            obj.ExtraSpellSchool = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.ExtraSchool].ToSpellSchool();
+            obj.AuraType = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.AuraType];
             return obj;
         }
     }

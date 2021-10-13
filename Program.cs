@@ -11,6 +11,8 @@ namespace PandarosWoWLogParser
 {
     class Program
     {
+        public static IContainer Container { get; set; }
+
         static void Main(string[] args)
         {
             var builder = new ContainerBuilder();
@@ -29,11 +31,15 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellHealParser>().As<ICombatParser<SpellHeal>>().SingleInstance();
             builder.RegisterType<BaseParser>().As<ICombatParser<CombatEventBase>>().SingleInstance();
             builder.RegisterType<EnviormentalDamageParser>().As<ICombatParser<EnviormentalDamage>>().SingleInstance();
+            builder.RegisterType<SpellInterruptParser>().As<ICombatParser<SpellInterrupt>>().SingleInstance();
+            builder.RegisterType<SpellDispelParser>().As<ICombatParser<SpellDispel>>().SingleInstance();
+            builder.RegisterType<SpellDrainParser>().As<ICombatParser<SpellDrain>>().SingleInstance();
+            builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
 
-            var container = builder.Build();
+            Container = builder.Build();
 
-            var clp = container.Resolve<CombatLogParser>();
+            var clp = Container.Resolve<CombatLogParser>();
 
             Console.WriteLine("Starting Parse.");
             Stopwatch sw = new Stopwatch();

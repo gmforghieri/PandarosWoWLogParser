@@ -15,15 +15,15 @@ namespace PandarosWoWLogParser.Parsers
         public SpellPeriodicDamage Parse(DateTime timestamp, string eventName, string[] eventData, SpellPeriodicDamage obj)
         {
             obj = (SpellPeriodicDamage)base.Parse(timestamp, eventName, eventData, obj);
-            obj.Damage = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Amount].ToInt();
-            obj.Overkill = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Overkill].ToInt();
-            obj.DamageSchool = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.School].ToSpellSchool();
-            obj.Resisted = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Resisted].ToInt();
-            obj.Blocked = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Blocked].ToInt();
-            obj.Absorbed = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Absorbed].ToInt();
-            obj.Critical = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Critical].ToBool();
-            obj.Glancing = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Glancing].ToBool();
-            obj.Crushing = eventData[EventInfo.SPELL_PERIODIC_DAMAGE.Crushing].ToBool();
+            obj.Damage = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Amount].ToInt();
+            obj.Overkill = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Overkill].ToInt();
+            obj.DamageSchool = eventData[Indexes.SPELL_PERIODIC_DAMAGE.School].ToSpellSchool();
+            obj.Resisted = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Resisted].ToInt();
+            obj.Blocked = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Blocked].ToInt();
+            obj.Absorbed = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Absorbed].ToInt();
+            obj.Critical = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Critical].ToBool();
+            obj.Glancing = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Glancing].ToBool();
+            obj.Crushing = eventData[Indexes.SPELL_PERIODIC_DAMAGE.Crushing].ToBool();
             return obj;
         }
     }

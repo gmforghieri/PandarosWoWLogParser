@@ -15,7 +15,7 @@ namespace PandarosWoWLogParser.Parsers
         public SpellFailed Parse(DateTime timestamp, string eventName, string[] eventData, SpellFailed obj)
         {
             obj = (SpellFailed)base.Parse(timestamp, eventName, eventData, obj);
-            obj.FailedType = eventData[EventInfo.SPELL_CAST_FAILED.CastFailedReason];
+            obj.FailedType = eventData[Indexes.SPELL_CAST_FAILED.CastFailedReason];
             return obj;
         }
     }

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using PandarosWoWLogParser.Models;
 using System.Threading.Tasks;
 using PandarosWoWLogParser.Parsers;
+using Autofac;
 
 namespace PandarosWoWLogParser
 {
@@ -29,6 +30,15 @@ namespace PandarosWoWLogParser
         ICombatParser<SpellHeal> _spellHealParser;
         ICombatParser<CombatEventBase> _combatEventParser;
         ICombatParser<EnviormentalDamage> _enviormentalDamage;
+        ICombatParser<SpellDispel> _spellDispel;
+        ICombatParser<SpellInterrupt> _spellInterrupt;
+        ICombatParser<SpellDrain> _spellDrain;
+        ICombatParser<Enchant> _enchant;
+
+        Dictionary<string, Type> KnownParsers = new Dictionary<string, Type>()
+        {
+            {LogEvents.SWING_DAMAGE, typeof(SwingDamage) }
+        };
 
         public CombatLogParser(ICombatParser<SpellDamage> spelldamageParser, 
                                ICombatParser<SpellPeriodicDamage> spellPeriodicParser,
@@ -43,6 +53,10 @@ namespace PandarosWoWLogParser
                                ICombatParser<SpellHeal> spellHeal,
                                ICombatParser<CombatEventBase> combatEventBase,
                                ICombatParser<EnviormentalDamage> enviormentalDamage,
+                               ICombatParser<SpellDispel> spellDispel,
+                               ICombatParser<SpellInterrupt> spellInterrupt,
+                               ICombatParser<SpellDrain> spellDrain,
+                               ICombatParser<Enchant> enchant,
                                ICombatParser<SpellEnergize> spellEnergize)
         {
             _spelldamageParser = spelldamageParser;
@@ -59,6 +73,10 @@ namespace PandarosWoWLogParser
             _spellHealParser = spellHeal;
             _combatEventParser = combatEventBase;
             _enviormentalDamage = enviormentalDamage;
+            _spellDispel = spellDispel;
+            _spellInterrupt = spellInterrupt;
+            _enchant = enchant;
+            _spellDrain = spellDrain;
         }
 
         public void ParseToEnd(string filepath)
@@ -145,74 +163,92 @@ namespace PandarosWoWLogParser
             time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond)).ToUniversalTime();
 
             return ParseObject(evt, data, time);
-
         }
 
         private CombatEventBase ParseObject(string evt, string data, DateTime time)
         {
+            var dataArray = ParseEventParameters(data);
+
             switch (evt)
             {
                 case LogEvents.SWING_DAMAGE:
-                    return _swingDamageParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _swingDamageParser.Parse(time, evt, dataArray);
 
                 case LogEvents.SWING_MISSED:
-                    return _swingMissedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _swingMissedParser.Parse(time, evt, dataArray);
 
                 case LogEvents.DAMAGE_SHIELD:
                 case LogEvents.SPELL_DAMAGE:
                 case LogEvents.RANGE_DAMAGE:
-                    return _spelldamageParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spelldamageParser.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_PERIODIC_DAMAGE:
-                    return _spellPeriodicParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellPeriodicParser.Parse(time, evt, dataArray);
 
                 case LogEvents.ENVIRONMENTAL_DAMAGE:
-                    return _enviormentalDamage.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _enviormentalDamage.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_CAST_START:
                 case LogEvents.SPELL_CAST_SUCCESS:
                 case LogEvents.SPELL_SUMMON:
                 case LogEvents.SPELL_CREATE:
                 case LogEvents.SPELL_RESURRECT:
+                case LogEvents.SPELL_ABSORBED:
                 case LogEvents.SPELL_INSTAKILL:
                 case LogEvents.SPELL_DURABILITY_DAMAGE:
                 case LogEvents.SPELL_DURABILITY_DAMAGE_ALL:
-                    return _spellParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellParser.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_CAST_FAILED:
-                    return _spellFailedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellFailedParser.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_ENERGIZE:
                 case LogEvents.SPELL_PERIODIC_ENERGIZE:
-                    return _spellEnergize.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellEnergize.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_AURA_APPLIED:
                 case LogEvents.SPELL_AURA_REMOVED:
                 case LogEvents.SPELL_AURA_REFRESH:
                 case LogEvents.SPELL_AURA_BROKEN:
-                    return _spellAura.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellAura.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_AURA_APPLIED_DOSE:
                 case LogEvents.SPELL_AURA_REMOVED_DOSE:
-                    return _spellAuraDose.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellAuraDose.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_AURA_BROKEN_SPELL:
-                    return _spellAuraBrokenSpell.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellAuraBrokenSpell.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_PERIODIC_MISSED:
                 case LogEvents.SPELL_MISSED:
                 case LogEvents.DAMAGE_SHIELD_MISSED:
                 case LogEvents.RANGE_MISSED:
-                    return _spellMissedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellMissedParser.Parse(time, evt, dataArray);
 
                 case LogEvents.SPELL_HEAL:
                 case LogEvents.SPELL_PERIODIC_HEAL:
-                    return _spellHealParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _spellHealParser.Parse(time, evt, dataArray);
 
                 case LogEvents.PARTY_KILL:
                 case LogEvents.UNIT_DESTROYED:
                 case LogEvents.UNIT_DIED:
-                    return _combatEventParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+                    return _combatEventParser.Parse(time, evt, dataArray);
+
+                case LogEvents.SPELL_DISPEL:
+                case LogEvents.SPELL_STOLEN:
+                    return _spellDispel.Parse(time, evt, dataArray);
+
+                case LogEvents.SPELL_INTERRUPT:
+                case LogEvents.SPELL_DISPEL_FAILED:
+                    return _spellInterrupt.Parse(time, evt, dataArray);
+
+                case LogEvents.SPELL_DRAIN:
+                case LogEvents.SPELL_LEECH:
+                    return _spellInterrupt.Parse(time, evt, dataArray);
+
+                case LogEvents.ENCHANT_REMOVED:
+                case LogEvents.ENCHANT_APPLIED:
+                    return _enchant.Parse(time, evt, dataArray);
 
                 default:
                     return null;

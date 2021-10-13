@@ -15,7 +15,7 @@ namespace PandarosWoWLogParser.Parsers
         public SpellAura Parse(DateTime timestamp, string eventName, string[] eventData, SpellAura obj)
         {
             obj = (SpellAura)base.Parse(timestamp, eventName, eventData, obj);
-            obj.AuraType = eventData[EventInfo.SPELL_AURA_APPLIED.AuraType];
+            obj.AuraType = eventData[Indexes.SPELL_AURA_APPLIED.AuraType];
 
             return obj;
         }

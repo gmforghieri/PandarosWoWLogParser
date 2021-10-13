@@ -7,6 +7,7 @@ using Autofac;
 using PandarosWoWLogParser.Parsers;
 using System.Collections.Generic;
 using PandarosWoWLogParser.Calculators;
+using PandarosWoWLogParser.FightMonitor;
 
 namespace PandarosWoWLogParser
 {
@@ -36,6 +37,22 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellDrainParser>().As<ICombatParser<SpellDrain>>().SingleInstance();
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
+
+            List<MonitoredZone> monitoredZones = new List<MonitoredZone>()
+            {
+                new MonitoredZone()
+                {
+                    ZoneName = "Test",
+                    MonitoredFights = new List<string>()
+                    {
+                        "Watchkeeper Gargolmar"
+                    }
+                }
+            };
+
+            builder.RegisterInstance(monitoredZones);
+            builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>().SingleInstance();
+
 
             List<ICalculator> calculators = new List<ICalculator>()
             {

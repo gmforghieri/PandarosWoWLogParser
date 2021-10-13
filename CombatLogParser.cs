@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using PandarosWoWLogParser.Parsers;
 using Autofac;
 using PandarosWoWLogParser.Calculators;
+using PandarosWoWLogParser.FightMonitor;
 
 namespace PandarosWoWLogParser
 {
@@ -18,11 +19,13 @@ namespace PandarosWoWLogParser
 
         IParserFactory _parserFactory;
         ICalculatorFactory _calculatorFactory;
+        IFightMonitorFactory _fightMonitorFactory;
 
-        public CombatLogParser(IParserFactory parserFactory, ICalculatorFactory calculatorFactory)
+        public CombatLogParser(IParserFactory parserFactory, ICalculatorFactory calculatorFactory, IFightMonitorFactory fightMonitorFactory)
         {
             _parserFactory = parserFactory;
             _calculatorFactory = calculatorFactory;
+            _fightMonitorFactory = fightMonitorFactory;
         }
 
         public int ParseToEnd(string filepath)
@@ -43,7 +46,7 @@ namespace PandarosWoWLogParser
 
             Dictionary<string, int> unknown = new Dictionary<string, int>();
             Dictionary<string, int> eventCount = new Dictionary<string, int>();
-
+            bool isInFight = false;
            
             using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -71,7 +74,27 @@ namespace PandarosWoWLogParser
                             else
                                 eventCount[evt.EventName] = val + 1;
 
-                            _calculatorFactory.CalculateEvent(evt);
+                            if (_fightMonitorFactory.IsMonitoredFight(evt))
+                            {
+                                isInFight = true;
+                            }
+                            else
+                            {
+                                if (isInFight)
+                                {
+                                    var fight = _fightMonitorFactory.GetFight();
+
+                                    foreach (var fightEvent in fight.MonitoredFightEvents)
+                                        _calculatorFactory.CalculateEvent(evt);
+
+                                    foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
+                                        _calculatorFactory.CalculateEvent(evt);
+
+                                    isInFight = false;
+                                }  
+                                else
+                                    _calculatorFactory.CalculateEvent(evt);
+                            }
                         }
 
                         long cur = fs.Position;

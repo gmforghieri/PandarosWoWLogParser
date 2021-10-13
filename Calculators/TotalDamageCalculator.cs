@@ -1,4 +1,5 @@
-﻿using PandarosWoWLogParser.Models;
+﻿using PandarosWoWLogParser.FightMonitor;
+using PandarosWoWLogParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -37,6 +38,16 @@ namespace PandarosWoWLogParser.Calculators
         }
 
         public void FinalizeCalculations()
+        {
+            
+        }
+
+        public void FinalizeFight(MonitoredFight fight)
+        {
+            
+        }
+
+        public void StartFight(MonitoredFight fight)
         {
             
         }

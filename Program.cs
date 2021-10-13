@@ -37,8 +37,13 @@ namespace PandarosWoWLogParser
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
 
+            List<ICalculator> calculators = new List<ICalculator>()
+            {
+                new TotalDamageCalculator()
+            };
 
 
+            builder.RegisterInstance(calculators);
             builder.RegisterType<CalculatorFactory>().As<ICalculatorFactory>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
 

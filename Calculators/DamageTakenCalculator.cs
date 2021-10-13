@@ -11,7 +11,7 @@ namespace PandarosWoWLogParser.Calculators
 
         public List<string> ApplicableEvents { get; set; } = new List<string>()
         {
-            LogEvents.SPELL_CAST_SUCCESS,
+            LogEvents.SPELL_DAMAGE,
             LogEvents.RANGE_DAMAGE,
             LogEvents.SWING_DAMAGE,
             LogEvents.SPELL_PERIODIC_DAMAGE

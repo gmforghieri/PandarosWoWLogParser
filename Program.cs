@@ -35,6 +35,7 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellDispelParser>().As<ICombatParser<SpellDispel>>().SingleInstance();
             builder.RegisterType<SpellDrainParser>().As<ICombatParser<SpellDrain>>().SingleInstance();
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
+            builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
 
             Container = builder.Build();
@@ -44,21 +45,10 @@ namespace PandarosWoWLogParser
             Console.WriteLine("Starting Parse.");
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            clp.ParseToEnd(@"C:\Program Files\Ascension Launcher\resources\client\Logs\WoWCombatLog.log");
+            var count = clp.ParseToEnd(@"C:\Program Files\Ascension Launcher\resources\client\Logs\WoWCombatLog.log");
             sw.Stop();
-            Console.WriteLine($"Parsed {clp.CombatQueue.Count} events in {sw.Elapsed}.");
-            Dictionary<string, int> eventCount = new Dictionary<string, int>();
+            Console.WriteLine($"Parsed {count} events in {sw.Elapsed}.");
 
-            while (clp.CombatQueue.TryDequeue(out var obj))
-            {
-                if (!eventCount.TryGetValue(obj.EventName, out int val))
-                    eventCount[obj.EventName] = 1;
-                else
-                    eventCount[obj.EventName] = val + 1;
-            }
-
-            foreach (var ev in eventCount)
-                Console.WriteLine($"{ev.Key}: {ev.Value}");
         }
     }
 }

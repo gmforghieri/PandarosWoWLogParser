@@ -14,75 +14,20 @@ namespace PandarosWoWLogParser
         public bool IsParsing { get; private set; } = false;
         public float ParseCompletionPercent { get; private set; } = 0f;
         public FileInfo FileInfo { get; private set; }
-        public Queue<CombatEventBase> CombatQueue { get; set; } = new Queue<CombatEventBase>();
+        // public Queue<CombatEventBase> CombatQueue { get; set; } = new Queue<CombatEventBase>();
 
-        ICombatParser<SpellDamage> _spelldamageParser;
-        ICombatParser<SpellPeriodicDamage> _spellPeriodicParser;
-        ICombatParser<SwingDamage> _swingDamageParser;
-        ICombatParser<SpellBase> _spellParser;
-        ICombatParser<SpellFailed> _spellFailedParser;
-        ICombatParser<SpellEnergize> _spellEnergize;
-        ICombatParser<SpellAura> _spellAura;
-        ICombatParser<SpellAuraDose> _spellAuraDose;
-        ICombatParser<SpellAuraBrokenSpell> _spellAuraBrokenSpell;
-        ICombatParser<SpellMissed> _spellMissedParser;
-        ICombatParser<SwingMissed> _swingMissedParser;
-        ICombatParser<SpellHeal> _spellHealParser;
-        ICombatParser<CombatEventBase> _combatEventParser;
-        ICombatParser<EnviormentalDamage> _enviormentalDamage;
-        ICombatParser<SpellDispel> _spellDispel;
-        ICombatParser<SpellInterrupt> _spellInterrupt;
-        ICombatParser<SpellDrain> _spellDrain;
-        ICombatParser<Enchant> _enchant;
+        IParserFactory _parserFactory;
 
-        Dictionary<string, Type> KnownParsers = new Dictionary<string, Type>()
+        public CombatLogParser(IParserFactory parserFactory)
         {
-            {LogEvents.SWING_DAMAGE, typeof(SwingDamage) }
-        };
-
-        public CombatLogParser(ICombatParser<SpellDamage> spelldamageParser, 
-                               ICombatParser<SpellPeriodicDamage> spellPeriodicParser,
-                               ICombatParser<SpellBase> spellParser,
-                               ICombatParser<SpellFailed> spellFailedParser,
-                               ICombatParser<SwingDamage> swingDamageParser,
-                               ICombatParser<SpellAura> spellAura,
-                               ICombatParser<SpellAuraDose> spellAuraDose,
-                               ICombatParser<SpellAuraBrokenSpell> spellAuraBrokenSpell,
-                               ICombatParser<SpellMissed> spellmissed,
-                               ICombatParser<SwingMissed> swingmissed,
-                               ICombatParser<SpellHeal> spellHeal,
-                               ICombatParser<CombatEventBase> combatEventBase,
-                               ICombatParser<EnviormentalDamage> enviormentalDamage,
-                               ICombatParser<SpellDispel> spellDispel,
-                               ICombatParser<SpellInterrupt> spellInterrupt,
-                               ICombatParser<SpellDrain> spellDrain,
-                               ICombatParser<Enchant> enchant,
-                               ICombatParser<SpellEnergize> spellEnergize)
-        {
-            _spelldamageParser = spelldamageParser;
-            _spellPeriodicParser = spellPeriodicParser;
-            _swingDamageParser = swingDamageParser;
-            _spellFailedParser = spellFailedParser;
-            _spellParser = spellParser;
-            _spellEnergize = spellEnergize;
-            _spellAura = spellAura;
-            _spellAuraDose = spellAuraDose;
-            _spellAuraBrokenSpell = spellAuraBrokenSpell;
-            _spellMissedParser = spellmissed;
-            _swingMissedParser = swingmissed;
-            _spellHealParser = spellHeal;
-            _combatEventParser = combatEventBase;
-            _enviormentalDamage = enviormentalDamage;
-            _spellDispel = spellDispel;
-            _spellInterrupt = spellInterrupt;
-            _enchant = enchant;
-            _spellDrain = spellDrain;
+            _parserFactory = parserFactory;
         }
 
-        public void ParseToEnd(string filepath)
+        public int ParseToEnd(string filepath)
         {
             ParseCompletionPercent = 0f;
             IsParsing = true;
+            var count = 0;
 
             if (File.Exists(filepath))
             {
@@ -92,7 +37,9 @@ namespace PandarosWoWLogParser
                 throw new FileNotFoundException("Combat Log not found", filepath);
 
             Dictionary<string, int> unknown = new Dictionary<string, int>();
+            Dictionary<string, int> eventCount = new Dictionary<string, int>();
 
+           
             using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (StreamReader sr = new StreamReader(fs))
@@ -103,16 +50,23 @@ namespace PandarosWoWLogParser
                     {
                         string line = sr.ReadLine();
                         CombatEventBase evt = ParseLine(line, out string evtStr);
+                        count++;
 
-                        if (evt != null)
-                            CombatQueue.Enqueue(evt);
-                        else
+                        if (evt == null)
                         {
                             if (!unknown.TryGetValue(evtStr, out int val))
                                 unknown.Add(evtStr, 1);
                             else
                                 unknown[evtStr] = val + 1;
                         }
+                        else
+                        {
+                            if (!eventCount.TryGetValue(evt.EventName, out int val))
+                                eventCount[evt.EventName] = 1;
+                            else
+                                eventCount[evt.EventName] = val + 1;
+                        }
+                        //    CombatQueue.Enqueue(evt);
 
                         long cur = fs.Position;
                         long total = fs.Length;
@@ -131,6 +85,14 @@ namespace PandarosWoWLogParser
             foreach (var ev in unknown)
                 Console.WriteLine($"{ev.Key}: {ev.Value}");
             Console.WriteLine($"``````````````````````````````````````````````````````````````");
+
+            Console.WriteLine($"Number of known events: {eventCount.Count}");
+            Console.WriteLine($"--------------------------------------------------------------");
+            foreach (var ev in eventCount)
+                Console.WriteLine($"{ev.Key}: {ev.Value}");
+            Console.WriteLine($"``````````````````````````````````````````````````````````````");
+
+            return count;
         }
 
 
@@ -156,104 +118,15 @@ namespace PandarosWoWLogParser
 
             evt = collection[7].Value;
             string data = collection[8].Value;
-
+            string[] dataArray = ParseEventParameters(data);
             DateTime time;
 
             //This should never error, as the date format is expected to be identical every time
             time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond)).ToUniversalTime();
 
-            return ParseObject(evt, data, time);
+            return _parserFactory.Parse(time, evt, dataArray);
         }
 
-        private CombatEventBase ParseObject(string evt, string data, DateTime time)
-        {
-            var dataArray = ParseEventParameters(data);
-
-            switch (evt)
-            {
-                case LogEvents.SWING_DAMAGE:
-                    return _swingDamageParser.Parse(time, evt, dataArray);
-
-                case LogEvents.SWING_MISSED:
-                    return _swingMissedParser.Parse(time, evt, dataArray);
-
-                case LogEvents.DAMAGE_SHIELD:
-                case LogEvents.SPELL_DAMAGE:
-                case LogEvents.RANGE_DAMAGE:
-                    return _spelldamageParser.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_PERIODIC_DAMAGE:
-                    return _spellPeriodicParser.Parse(time, evt, dataArray);
-
-                case LogEvents.ENVIRONMENTAL_DAMAGE:
-                    return _enviormentalDamage.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_CAST_START:
-                case LogEvents.SPELL_CAST_SUCCESS:
-                case LogEvents.SPELL_SUMMON:
-                case LogEvents.SPELL_CREATE:
-                case LogEvents.SPELL_RESURRECT:
-                case LogEvents.SPELL_ABSORBED:
-                case LogEvents.SPELL_INSTAKILL:
-                case LogEvents.SPELL_DURABILITY_DAMAGE:
-                case LogEvents.SPELL_DURABILITY_DAMAGE_ALL:
-                    return _spellParser.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_CAST_FAILED:
-                    return _spellFailedParser.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_ENERGIZE:
-                case LogEvents.SPELL_PERIODIC_ENERGIZE:
-                    return _spellEnergize.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_AURA_APPLIED:
-                case LogEvents.SPELL_AURA_REMOVED:
-                case LogEvents.SPELL_AURA_REFRESH:
-                case LogEvents.SPELL_AURA_BROKEN:
-                    return _spellAura.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_AURA_APPLIED_DOSE:
-                case LogEvents.SPELL_AURA_REMOVED_DOSE:
-                    return _spellAuraDose.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_AURA_BROKEN_SPELL:
-                    return _spellAuraBrokenSpell.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_PERIODIC_MISSED:
-                case LogEvents.SPELL_MISSED:
-                case LogEvents.DAMAGE_SHIELD_MISSED:
-                case LogEvents.RANGE_MISSED:
-                    return _spellMissedParser.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_HEAL:
-                case LogEvents.SPELL_PERIODIC_HEAL:
-                    return _spellHealParser.Parse(time, evt, dataArray);
-
-                case LogEvents.PARTY_KILL:
-                case LogEvents.UNIT_DESTROYED:
-                case LogEvents.UNIT_DIED:
-                    return _combatEventParser.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_DISPEL:
-                case LogEvents.SPELL_STOLEN:
-                    return _spellDispel.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_INTERRUPT:
-                case LogEvents.SPELL_DISPEL_FAILED:
-                    return _spellInterrupt.Parse(time, evt, dataArray);
-
-                case LogEvents.SPELL_DRAIN:
-                case LogEvents.SPELL_LEECH:
-                    return _spellInterrupt.Parse(time, evt, dataArray);
-
-                case LogEvents.ENCHANT_REMOVED:
-                case LogEvents.ENCHANT_APPLIED:
-                    return _enchant.Parse(time, evt, dataArray);
-
-                default:
-                    return null;
-            }
-        }
 
         private string[] ParseEventParameters(string unsplitParameters)
         {

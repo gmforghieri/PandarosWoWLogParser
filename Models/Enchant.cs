@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class Enchant : CombatEventBase
+    public class Enchant : CombatEventBase, IEnchant
     {
         public string SpellName { get; set; }
         public int ItemID { get; set; }

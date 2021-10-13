@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autofac;
 using PandarosWoWLogParser.Parsers;
 using System.Collections.Generic;
+using PandarosWoWLogParser.Calculators;
 
 namespace PandarosWoWLogParser
 {
@@ -17,7 +18,6 @@ namespace PandarosWoWLogParser
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
-            builder.RegisterType<SpellPeriodicDamageParser>().As<ICombatParser<SpellPeriodicDamage>>().SingleInstance();
             builder.RegisterType<SwingDamageParser>().As<ICombatParser<SwingDamage>>().SingleInstance();
             builder.RegisterType<SpellFailedParser>().As<ICombatParser<SpellFailed>>().SingleInstance();
             builder.RegisterType<SpellParser>().As<ICombatParser<SpellBase>>().SingleInstance();
@@ -36,6 +36,10 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellDrainParser>().As<ICombatParser<SpellDrain>>().SingleInstance();
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
+
+
+
+            builder.RegisterType<CalculatorFactory>().As<ICalculatorFactory>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
 
             Container = builder.Build();

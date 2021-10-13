@@ -6,6 +6,7 @@ using PandarosWoWLogParser.Models;
 using System.Threading.Tasks;
 using PandarosWoWLogParser.Parsers;
 using Autofac;
+using PandarosWoWLogParser.Calculators;
 
 namespace PandarosWoWLogParser
 {
@@ -14,17 +15,21 @@ namespace PandarosWoWLogParser
         public bool IsParsing { get; private set; } = false;
         public float ParseCompletionPercent { get; private set; } = 0f;
         public FileInfo FileInfo { get; private set; }
-        // public Queue<CombatEventBase> CombatQueue { get; set; } = new Queue<CombatEventBase>();
 
         IParserFactory _parserFactory;
+        ICalculatorFactory _calculatorFactory;
 
-        public CombatLogParser(IParserFactory parserFactory)
+        public CombatLogParser(IParserFactory parserFactory, ICalculatorFactory calculatorFactory)
         {
             _parserFactory = parserFactory;
+            _calculatorFactory = calculatorFactory;
         }
 
         public int ParseToEnd(string filepath)
         {
+            if (IsParsing)
+                return -1;
+
             ParseCompletionPercent = 0f;
             IsParsing = true;
             var count = 0;
@@ -65,8 +70,9 @@ namespace PandarosWoWLogParser
                                 eventCount[evt.EventName] = 1;
                             else
                                 eventCount[evt.EventName] = val + 1;
+
+                            _calculatorFactory.CalculateEvent(evt);
                         }
-                        //    CombatQueue.Enqueue(evt);
 
                         long cur = fs.Position;
                         long total = fs.Length;

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellHeal : SpellBase
+    public class SpellHeal : SpellBase, ISpellHeal
     {
         public int HealAmount { get; set; }
         public int Overhealing { get; set; }

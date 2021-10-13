@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellDrain : SpellBase
+    public class SpellDrain : SpellBase, ISpellDrain
     {
         public int DrainAmount { get; set; }
         public PowerType PowerType { get; set; }

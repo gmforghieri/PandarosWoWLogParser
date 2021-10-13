@@ -17,7 +17,7 @@ namespace PandarosWoWLogParser.Parsers
             obj = (SwingDamage)base.Parse(timestamp, eventName, eventData, obj);
             obj.Damage = eventData[Indexes.SWING_DAMAGE.Amount].ToInt();
             obj.Overkill = eventData[Indexes.SWING_DAMAGE.Overkill].ToInt();
-            obj.School = eventData[Indexes.SWING_DAMAGE.School].ToSpellSchool();
+            obj.DamageSchool = eventData[Indexes.SWING_DAMAGE.School].ToSpellSchool();
             obj.Resisted = eventData[Indexes.SWING_DAMAGE.Resisted].ToInt();
             obj.Blocked = eventData[Indexes.SWING_DAMAGE.Blocked].ToInt();
             obj.Absorbed = eventData[Indexes.SWING_DAMAGE.Absorbed].ToInt();

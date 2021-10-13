@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellAura : SpellBase
+    public class SpellAura : SpellBase, ISpellAura
     {
         public string AuraType { get; set; }
     }

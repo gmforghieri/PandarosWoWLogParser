@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellFailed : SpellBase
+    public class SpellFailed : SpellBase, ISpellFailed
     {
         public string FailedType { get; set; }
     }

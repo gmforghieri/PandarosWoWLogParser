@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class CombatEventBase
+    public class CombatEventBase : ICombatEvent
     {
         public DateTime Timestamp { get; set; }
         public string EventName { get; set; }

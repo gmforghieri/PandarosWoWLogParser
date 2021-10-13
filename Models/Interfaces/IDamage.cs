@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellPeriodicDamage : SpellBase
+    public interface IDamage
     {
         public int Damage { get; set; }
         public int Overkill { get; set; }

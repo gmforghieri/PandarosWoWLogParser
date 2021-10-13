@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class EnviormentalDamage : EnviormentalBase
+    public class EnviormentalDamage : EnviormentalBase, IDamage
     {
         public int Damage { get; set; }
         public int Overkill { get; set; }

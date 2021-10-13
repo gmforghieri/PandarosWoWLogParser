@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SwingMissed : SwingBase
+    public class SwingMissed : SwingBase, ISwingMissed
     {
         public string MissedReason { get; set; }
     }

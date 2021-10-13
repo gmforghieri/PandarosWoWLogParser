@@ -11,7 +11,6 @@ namespace PandarosWoWLogParser.Parsers
 
 
         public ParserFactory(ICombatParser<SpellDamage> spelldamageParser,
-                               ICombatParser<SpellPeriodicDamage> spellPeriodicParser,
                                ICombatParser<SpellBase> spellParser,
                                ICombatParser<SpellFailed> spellFailedParser,
                                ICombatParser<SwingDamage> swingDamageParser,
@@ -34,7 +33,7 @@ namespace PandarosWoWLogParser.Parsers
             Parsers.Add(LogEvents.DAMAGE_SHIELD, spelldamageParser.Parse);
             Parsers.Add(LogEvents.SPELL_DAMAGE, spelldamageParser.Parse);
             Parsers.Add(LogEvents.RANGE_DAMAGE, spelldamageParser.Parse);
-            Parsers.Add(LogEvents.SPELL_PERIODIC_DAMAGE, spellPeriodicParser.Parse);
+            Parsers.Add(LogEvents.SPELL_PERIODIC_DAMAGE, spelldamageParser.Parse);
             Parsers.Add(LogEvents.ENVIRONMENTAL_DAMAGE, enviormentalDamageParser.Parse);
             Parsers.Add(LogEvents.SPELL_CAST_START, spellParser.Parse);
             Parsers.Add(LogEvents.SPELL_CAST_SUCCESS, spellParser.Parse);

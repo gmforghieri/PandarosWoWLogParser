@@ -4,11 +4,11 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SwingDamage : SwingBase
+    public class SwingDamage : SwingBase, IDamage
     {
         public int Damage { get; set; }
         public int Overkill { get; set; }
-        public SpellSchool School { get; set; }
+        public SpellSchool DamageSchool { get; set; }
         public int Resisted { get; set; }
         public int Blocked { get; set; }
         public int Absorbed { get; set; }

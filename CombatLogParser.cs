@@ -18,14 +18,35 @@ namespace PandarosWoWLogParser
         ICombatParser<SpellDamage> _spelldamageParser;
         ICombatParser<SpellPeriodicDamage> _spellPeriodicParser;
         ICombatParser<SwingDamage> _swingDamageParser;
+        ICombatParser<SpellBase> _spellParser;
+        ICombatParser<SpellFailed> _spellFailedParser;
+        ICombatParser<SpellEnergize> _spellEnergize;
+        ICombatParser<SpellAura> _spellAura;
+        ICombatParser<SpellAuraDose> _spellAuraDose;
+        ICombatParser<SpellAuraBrokenSpell> _spellAuraBrokenSpell;
+        ICombatParser<SpellMissed> _spellMissedParser;
 
         public CombatLogParser(ICombatParser<SpellDamage> spelldamageParser, 
                                ICombatParser<SpellPeriodicDamage> spellPeriodicParser,
-                               ICombatParser<SwingDamage> swingDamageParser)
+                               ICombatParser<SpellBase> spellParser,
+                               ICombatParser<SpellFailed> spellFailedParser,
+                               ICombatParser<SwingDamage> swingDamageParser,
+                               ICombatParser<SpellAura> spellAura,
+                               ICombatParser<SpellAuraDose> spellAuraDose,
+                               ICombatParser<SpellAuraBrokenSpell> spellAuraBrokenSpell,
+                               ICombatParser<SpellMissed> spellmissed,
+                               ICombatParser<SpellEnergize> spellEnergize)
         {
             _spelldamageParser = spelldamageParser;
             _spellPeriodicParser = spellPeriodicParser;
             _swingDamageParser = swingDamageParser;
+            _spellFailedParser = spellFailedParser;
+            _spellParser = spellParser;
+            _spellEnergize = spellEnergize;
+            _spellAura = spellAura;
+            _spellAuraDose = spellAuraDose;
+            _spellAuraBrokenSpell = spellAuraBrokenSpell;
+            _spellMissedParser = spellmissed;
         }
 
         public void ParseToEnd(string filepath)
@@ -97,22 +118,55 @@ namespace PandarosWoWLogParser
             //This should never error, as the date format is expected to be identical every time
             time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond));
 
-            switch(evt)
+            return ParseObject(evt, data, time);
+
+        }
+
+        private CombatEventBase ParseObject(string evt, string data, DateTime time)
+        {
+            switch (evt)
             {
-                case Events.SWING_DAMAGE:
+                case LogEvents.SWING_DAMAGE:
                     return _swingDamageParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
-                case Events.SPELL_DAMAGE:
+                case LogEvents.SPELL_DAMAGE:
                     return _spelldamageParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
-                case Events.SPELL_PERIODIC_DAMAGE:
+                case LogEvents.SPELL_PERIODIC_DAMAGE:
                     return _spellPeriodicParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_CAST_START:
+                case LogEvents.SPELL_CAST_SUCCESS:
+                    return _spellParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_CAST_FAILED:
+                    return _spellFailedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_ENERGIZE:
+                case LogEvents.SPELL_PERIODIC_ENERGIZE:
+                    return _spellEnergize.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_AURA_APPLIED:
+                case LogEvents.SPELL_AURA_REMOVED:
+                case LogEvents.SPELL_AURA_REFRESH:
+                case LogEvents.SPELL_AURA_BROKEN:
+                    return _spellAura.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_AURA_APPLIED_DOSE:
+                case LogEvents.SPELL_AURA_REMOVED_DOSE:
+                    return _spellAuraDose.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_AURA_BROKEN_SPELL:
+                    return _spellAuraBrokenSpell.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
+
+                case LogEvents.SPELL_MISSED:
+                    return _spellMissedParser.Parse(time.ToUniversalTime(), evt, ParseEventParameters(data));
 
                 default:
                     return null;
             }
-
         }
+
         private string[] ParseEventParameters(string unsplitParameters)
         {
             //Because the combat log can have lines like the following, we need to do a custom parse as opposed to a comma split

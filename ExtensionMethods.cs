@@ -1,4 +1,5 @@
-﻿using CombatLogParser;
+﻿using Autofac;
+using CombatLogParser;
 using System;
 
 namespace PandarosWoWLogParser

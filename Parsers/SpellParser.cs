@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Parsers
 {
-    public abstract class SpellParser : BaseParser, ICombatParser<SpellBase>
+    public class SpellParser : BaseParser, ICombatParser<SpellBase>
     {
         public new virtual SpellBase Parse(DateTime timestamp, string eventName, string[] eventData)
         {

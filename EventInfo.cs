@@ -13,103 +13,24 @@ namespace PandarosWoWLogParser.EventInfo
         public const int DestFlags = 5;
     }
 
-    public class ENCOUNTER_START
-    {
-        public const int EncounterId = 0;
-        public const int EncounterName = 1;
-        public const int DifficultyId = 2;
-        public const int RaidSize = 3;
-        public const bool HasUnitKeys = false;
-    }
-
-    public class ENCOUNTER_END
-    {
-        public const int EncounterId = 0;
-        public const int EncounterName = 1;
-        public const int DifficultyId = 2;
-        public const int RaidSize = 3;
-        public const int Wiped = 4;
-        public const bool HasUnitKeys = false;
-    }
-
-    public class SPELL_CAST_SUCCESS
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int TargetGUID = 11;
-        public const int TargetGUIDOwner = 12;
-        public const int TargetHP = 13;
-        public const int TargetMaxHP = 14;
-        public const int TargetAttackPower = 15;
-        public const int TargetSpellPower = 16;
-        public const int TargetResolve = 17;
-        public const int CastSpellResource = 18;
-        public const int CurrentResource = 19;
-        public const int MaxResource = 20;
-        public const int TargetPosX = 21;
-        public const int TargetPosY = 22;
-        public const int TargetItemLvl = 23;
-    }
 
     public class SPELL_CAST_START
     {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
+        public const int CastSpellId = 6;
+        public const int CastSpellName = 7;
+        public const int CastSpellSchool = 8;
         public const bool HasUnitKeys = false;
     }
 
     public class SPELL_CAST_FAILED
     {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int CastFailedReason = 11;
+        public const int CastFailedReason = 8;
     }
 
     public class SPELL_ENERGIZE
     {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int TargetGUID = 11;
-        public const int TargetGUIDOwner = 12;
-        public const int TargetHP = 13;
-        public const int TargetMaxHP = 14;
-        public const int TargetAttackPower = 15;
-        public const int TargetSpellPower = 16;
-        public const int TargetResolve = 17;
-        public const int CastSpellResource = 18;
-        public const int CurrentResource = 19;
-        public const int MaxResource = 20;
-        public const int TargetPosX = 21;
-        public const int TargetPosY = 22;
-        public const int TargetItemLvl = 23;
-        public const int ResourceGain = 24;
-        public const int ResourceType = 25;
-    }
-
-    public class SPELL_PERIODIC_ENERGIZE //unsure of 17
-    {
-        public const int CastSpellId = 8;
-        public const int CastSpellName = 9;
-        public const int CastSpellSchool = 10;
-        public const int TargetGUID = 11;
-        public const int TargetGUIDOwner = 12;
-        public const int TargetHP = 13;
-        public const int TargetMaxHP = 14;
-        public const int TargetAttackPower = 15;
-        public const int TargetSpellPower = 16;
-        public const int TargetResolve = 17;
-        public const int CastSpellResource = 18;
-        public const int CurrentResource = 19;
-        public const int MaxResource = 20;
-        public const int TargetPosX = 21;
-        public const int TargetPosY = 22;
-        public const int TargetItemLvl = 23;
-        public const int ResourceGain = 24;
-        public const int ResourceType = 25;
+        public const int EneryAmount = 9;
+        public const int PowerType = 10;
     }
 
     public class SPELL_SUMMON
@@ -121,63 +42,30 @@ namespace PandarosWoWLogParser.EventInfo
 
     public class SPELL_AURA_APPLIED
     {
-        public const int AuraSpellId = 8;
-        public const int AuraSpellName = 9;
-        public const int AuraSpellSchool = 10;
-        public const int AuraBuffType = 11;
+        public const int AuraType = 9;
     }
 
     public class SPELL_AURA_APPLIED_DOSE
     {
-        public const int AuraSpellId = 8;
-        public const int AuraSpellName = 9;
-        public const int AuraSpellSchool = 10;
-        public const int AuraBuffType = 11;
-        public const int AuraDosesAdded = 12;
-    }
-
-    public class SPELL_AURA_REMOVED
-    {
-        public const int AuraSpellId = 8;
-        public const int AuraSpellName = 9;
-        public const int AuraSpellSchool = 10;
-        public const int AuraBuffType = 11;
-    }
-
-    public class SPELL_AURA_REFRESH
-    {
-        public const int AuraSpellId = 8;
-        public const int AuraSpellName = 9;
-        public const int AuraSpellSchool = 10;
-        public const int AuraBuffType = 11;
-    }
-
-    public class SPELL_AURA_REMOVED_DOSE
-    {
-        public const int AuraSpellId = 8;
-        public const int AuraSpellName = 9;
-        public const int AuraSpellSchool = 10;
-        public const int AuraBuffType = 11;
-        public const int AuraDosesRemoved = 12;
+        public const int AuraType = 9;
+        public const int AuraDosesAdded = 10;
     }
 
     public class SPELL_AURA_BROKEN_SPELL
     {
-        public const int CastAuraSpellId = 8;
-        public const int CastAuraSpellName = 9;
-        public const int CastAuraSpellSchool = 10;
-        public const int RemovedAuraSpellId = 11;
-        public const int RemovedAuraSpellName = 12;
-        public const int RemovedAuraSpellSchool = 13;
-        public const int CastAuraBuffType = 14;
+        public const int ExtraSpellID = 8;
+        public const int ExtraSpellName = 9;
+        public const int ExtraSchool = 10;
+        public const int AuraType = 11;
     }
 
-    public class SPELL_MISSED //12-13 unknown
+    public class SPELL_MISSED
     {
-        public const int MissedReason = 11;
+        public const int MissedType = 9;
+        public const int MissedDamage = 10;
     }
 
-    public class SPELL_DAMAGE //27-33 unknown
+    public class SPELL_DAMAGE
     {
         public const int Amount = 9;
         public const int Overkill = 10;
@@ -190,7 +78,7 @@ namespace PandarosWoWLogParser.EventInfo
         public const int Crushing = 17;
     }
 
-    public class SPELL_PERIODIC_DAMAGE //27-33 unknown
+    public class SPELL_PERIODIC_DAMAGE
     {
         public const int Amount = 9;
         public const int Overkill = 10;
@@ -203,7 +91,7 @@ namespace PandarosWoWLogParser.EventInfo
         public const int Crushing = 17;
     }
 
-    public class SPELL_PERIODIC_MISSED //12-14 unknown
+    public class SPELL_PERIODIC_MISSED
     {
         public const int CastSpellId = 8;
         public const int CastSpellName = 9;
@@ -211,12 +99,12 @@ namespace PandarosWoWLogParser.EventInfo
         public const int MissedReason = 11;
     }
 
-    public class SPELL_ABSORBED //8-15 unknown
+    public class SPELL_ABSORBED
     {
         public const bool HasUnitKeys = true;
     }
 
-    public class SPELL_HEAL //27-28 unknown
+    public class SPELL_HEAL 
     {
         public const int CastSpellId = 8;
         public const int CastSpellName = 9;
@@ -239,7 +127,7 @@ namespace PandarosWoWLogParser.EventInfo
         public const int HealSpellSchool = 26;
     }
 
-    public class SPELL_PERIODIC_HEAL //27-28 unknown
+    public class SPELL_PERIODIC_HEAL
     {
         public const int CastSpellId = 8;
         public const int CastSpellName = 9;
@@ -293,7 +181,7 @@ namespace PandarosWoWLogParser.EventInfo
         public const int CastSpellSchool = 10;
     }
 
-    public class RANGE_DAMAGE //unknown 26-33
+    public class RANGE_DAMAGE
     {
         public const int CastSpellId = 8;
         public const int CastSpellName = 9;

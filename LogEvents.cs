@@ -2,10 +2,8 @@
 
 namespace PandarosWoWLogParser
 {
-    public static class Events
+    public class LogEvents
     {
-        public const string ENCOUNTER_START = "ENCOUNTER_START";
-        public const string ENCOUNTER_END = "ENCOUNTER_END";
         public const string SPELL_CAST_SUCCESS = "SPELL_CAST_SUCCESS";
         public const string SPELL_CAST_START = "SPELL_CAST_START";
         public const string SPELL_CAST_FAILED = "SPELL_CAST_FAILED";
@@ -16,6 +14,7 @@ namespace PandarosWoWLogParser
         public const string SPELL_AURA_APPLIED_DOSE = "SPELL_AURA_APPLIED_DOSE";
         public const string SPELL_AURA_REMOVED = "SPELL_AURA_REMOVED";
         public const string SPELL_AURA_REFRESH = "SPELL_AURA_REFRESH";
+        public const string SPELL_AURA_BROKEN = "SPELL_AURA_BROKEN";
         public const string SPELL_AURA_REMOVED_DOSE = "SPELL_AURA_REMOVED_DOSE";
         public const string SPELL_AURA_BROKEN_SPELL = "SPELL_AURA_BROKEN_SPELL";
         public const string SPELL_MISSED = "SPELL_MISSED";

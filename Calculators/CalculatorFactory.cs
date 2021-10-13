@@ -39,12 +39,16 @@ namespace PandarosWoWLogParser.Calculators
 
         public void StartFight(MonitoredFight fight)
         {
-
+            foreach (var calcKvp in Calculators)
+                foreach (var calc in calcKvp.Value)
+                    calc.StartFight(fight);
         }
 
         public void FinalizeFight(MonitoredFight fight)
         {
-
+            foreach (var calcKvp in Calculators)
+                foreach (var calc in calcKvp.Value)
+                    calc.FinalizeFight(fight);
         }
     }
 }

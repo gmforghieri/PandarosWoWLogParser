@@ -84,8 +84,12 @@ namespace PandarosWoWLogParser
                                 {
                                     var fight = _fightMonitorFactory.GetFight();
 
+                                    _calculatorFactory.StartFight(fight);
+
                                     foreach (var fightEvent in fight.MonitoredFightEvents)
                                         _calculatorFactory.CalculateEvent(evt);
+
+                                    _calculatorFactory.FinalizeFight(fight);
 
                                     foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
                                         _calculatorFactory.CalculateEvent(evt);

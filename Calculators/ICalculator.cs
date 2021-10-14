@@ -9,9 +9,9 @@ namespace PandarosWoWLogParser.Calculators
     public interface ICalculator
     {
         public List<string> ApplicableEvents { get; set; }
-        public void CalculateEvent(CombatEventBase combatEvent);
-        public void FinalizeCalculations();
-        public void StartFight(MonitoredFight fight);
-        public void FinalizeFight(MonitoredFight fight);
+        public void CalculateEvent(ICombatEvent combatEvent, CombatState state);
+        public void FinalizeCalculations(CombatState state);
+        public void StartFight(MonitoredFight fight, CombatState state);
+        public void FinalizeFight(MonitoredFight fight, CombatState state);
     }
 }

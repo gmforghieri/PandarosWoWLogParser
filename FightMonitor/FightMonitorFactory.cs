@@ -8,9 +8,20 @@ namespace PandarosWoWLogParser.FightMonitor
 {
     public class FightMonitorFactory : IFightMonitorFactory
     {
+        public static List<string> CombatEventsTriggerInFight { get; set; } = new List<string>()
+        {
+            LogEvents.SPELL_DAMAGE,
+            LogEvents.SPELL_PERIODIC_DAMAGE,
+            LogEvents.RANGE_MISSED,
+            LogEvents.RANGE_DAMAGE,
+            LogEvents.SPELL_MISSED,
+            LogEvents.SWING_DAMAGE,
+            LogEvents.SWING_MISSED
+        };
+
         public List<MonitoredZone> MonitoredZones { get; set; }
 
-        public Dictionary<string, MonitoredZone> MonitoredBosses { get; set; } = new Dictionary<string, MonitoredZone>();
+        public Dictionary<string, Tuple<string, MonitoredZone>> MonitoredBosses { get; set; } = new Dictionary<string, Tuple<string, MonitoredZone>>();
 
         public bool IsInFight { get; set; }
 
@@ -21,28 +32,42 @@ namespace PandarosWoWLogParser.FightMonitor
             MonitoredZones = monitoredZones;
 
             foreach (var zone in monitoredZones)
-                foreach (var boss in zone.MonitoredFights)
-                    MonitoredBosses[boss] = zone;
+                foreach (var bossList in zone.MonitoredFights)
+                    foreach (var boss in bossList.Value)
+                        MonitoredBosses[boss] = Tuple.Create(bossList.Key, zone);
         }
 
-        public bool IsMonitoredFight(ICombatEvent evnt)
+        public bool IsMonitoredFight(ICombatEvent evnt, CombatState state)
         {
-            if (!IsInFight)
+            if (!IsInFight && CombatEventsTriggerInFight.Contains(evnt.EventName))
             {
-                IsInFight = MonitoredBosses.ContainsKey(evnt.DestName) || MonitoredBosses.ContainsKey(evnt.SourceName);
-
-                if (IsInFight)
+                if (MonitoredBosses.ContainsKey(evnt.DestName))
+                {
+                    IsInFight = true;
                     CurrentFight = new MonitoredFight()
                     {
-                        CurrentZone = MonitoredBosses[evnt.DestName],
+                        CurrentZone = MonitoredBosses[evnt.DestName].Item2,
+                        BossName = MonitoredBosses[evnt.DestName].Item1,
                         FightStart = evnt.Timestamp,
-                        MonsterName = evnt.DestName
+                        MonsterID = new Dictionary<string, bool>() { { evnt.DestName, false } }
                     };
+                }
+                else if (MonitoredBosses.ContainsKey(evnt.SourceName))
+                {
+                    IsInFight = true;
+                    CurrentFight = new MonitoredFight()
+                    {
+                        CurrentZone = MonitoredBosses[evnt.SourceName].Item2,
+                        BossName = MonitoredBosses[evnt.SourceName].Item1,
+                        FightStart = evnt.Timestamp,
+                        MonsterID = new Dictionary<string, bool>() { { evnt.SourceName, false } }
+                    };
+                }
             }
 
             if (IsInFight)
             {
-                IsInFight = CurrentFight.AddEvent(evnt);
+                IsInFight = CurrentFight.AddEvent(evnt, state);
             }
 
             return IsInFight;

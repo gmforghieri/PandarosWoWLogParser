@@ -20,12 +20,14 @@ namespace PandarosWoWLogParser
         IParserFactory _parserFactory;
         ICalculatorFactory _calculatorFactory;
         IFightMonitorFactory _fightMonitorFactory;
+        IPandaLogger _logger;
 
-        public CombatLogParser(IParserFactory parserFactory, ICalculatorFactory calculatorFactory, IFightMonitorFactory fightMonitorFactory)
+        public CombatLogParser(IParserFactory parserFactory, ICalculatorFactory calculatorFactory, IFightMonitorFactory fightMonitorFactory, IPandaLogger logger)
         {
             _parserFactory = parserFactory;
             _calculatorFactory = calculatorFactory;
             _fightMonitorFactory = fightMonitorFactory;
+            _logger = logger;
         }
 
         public int ParseToEnd(string filepath)
@@ -47,7 +49,8 @@ namespace PandarosWoWLogParser
             Dictionary<string, int> unknown = new Dictionary<string, int>();
             Dictionary<string, int> eventCount = new Dictionary<string, int>();
             bool isInFight = false;
-           
+            CombatState state = new CombatState();
+
             using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (StreamReader sr = new StreamReader(fs))
@@ -77,7 +80,8 @@ namespace PandarosWoWLogParser
                             else
                                 eventCount[evt.EventName] = val + 1;
 
-                            if (_fightMonitorFactory.IsMonitoredFight(evt))
+                            state.ProcessCombatEvent(evt);
+                            if (_fightMonitorFactory.IsMonitoredFight(evt, state))
                             {
                                 isInFight = true;
                             }
@@ -87,20 +91,20 @@ namespace PandarosWoWLogParser
                                 {
                                     var fight = _fightMonitorFactory.GetFight();
 
-                                    _calculatorFactory.StartFight(fight);
+                                    _calculatorFactory.StartFight(fight, state);
 
                                     foreach (var fightEvent in fight.MonitoredFightEvents)
-                                        _calculatorFactory.CalculateEvent(evt);
+                                        _calculatorFactory.CalculateEvent(fightEvent, state);
 
-                                    _calculatorFactory.FinalizeFight(fight);
+                                    _calculatorFactory.FinalizeFight(fight, state);
 
                                     foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
-                                        _calculatorFactory.CalculateEvent(evt);
+                                        _calculatorFactory.CalculateEvent(unmonitoredEvent, state);
 
                                     isInFight = false;
                                 }  
                                 else
-                                    _calculatorFactory.CalculateEvent(evt);
+                                    _calculatorFactory.CalculateEvent(evt, state);
                             }
                         }
 
@@ -115,20 +119,20 @@ namespace PandarosWoWLogParser
                 }
             }
             IsParsing = false;
-            Console.WriteLine($"``````````````````````````````````````````````````````````````");
-            Console.WriteLine($"Number of unknown events: {unknown.Count}");
-            Console.WriteLine($"--------------------------------------------------------------");
+            _logger.Log($"``````````````````````````````````````````````````````````````");
+            _logger.Log($"Number of unknown events: {unknown.Count}");
+            _logger.Log($"--------------------------------------------------------------");
             foreach (var ev in unknown)
-                Console.WriteLine($"{ev.Key}: {ev.Value}");
-            Console.WriteLine($"``````````````````````````````````````````````````````````````");
+                _logger.Log($"{ev.Key}: {ev.Value}");
+            _logger.Log($"``````````````````````````````````````````````````````````````");
 
-            Console.WriteLine($"Number of known events: {eventCount.Count}");
-            Console.WriteLine($"--------------------------------------------------------------");
+            _logger.Log($"Number of known events: {eventCount.Count}");
+            _logger.Log($"--------------------------------------------------------------");
             foreach (var ev in eventCount)
-                Console.WriteLine($"{ev.Key}: {ev.Value}");
-            Console.WriteLine($"``````````````````````````````````````````````````````````````");
+                _logger.Log($"{ev.Key}: {ev.Value}");
+            _logger.Log($"``````````````````````````````````````````````````````````````");
 
-            _calculatorFactory.FinalizeCalculations();
+            _calculatorFactory.FinalizeCalculations(state);
 
             return count;
         }

@@ -18,22 +18,22 @@ namespace PandarosWoWLogParser.Calculators
             LogEvents.SPELL_PERIODIC_DAMAGE
         };
 
-        public void CalculateEvent(CombatEventBase combatEvent)
+        public void CalculateEvent(ICombatEvent combatEvent, CombatState state)
         {
             var damage = (IDamage)combatEvent;
         }
 
-        public void FinalizeCalculations()
+        public void FinalizeCalculations(CombatState state)
         {
             
         }
 
-        public void FinalizeFight(MonitoredFight fight)
+        public void FinalizeFight(MonitoredFight fight, CombatState state)
         {
             
         }
 
-        public void StartFight(MonitoredFight fight)
+        public void StartFight(MonitoredFight fight, CombatState state)
         {
             
         }

@@ -10,12 +10,12 @@ namespace PandarosWoWLogParser.Calculators
     {
         public Dictionary<string, List<ICalculator>> Calculators { get; set; }
 
-        public void CalculateEvent(CombatEventBase combatEvent);
+        public void CalculateEvent(ICombatEvent combatEvent, CombatState state);
 
-        public void FinalizeCalculations();
+        public void FinalizeCalculations(CombatState state);
 
-        public void StartFight(MonitoredFight fight);
+        public void StartFight(MonitoredFight fight, CombatState state);
 
-        public void FinalizeFight(MonitoredFight fight);
+        public void FinalizeFight(MonitoredFight fight, CombatState state);
     }
 }

@@ -18,6 +18,8 @@ namespace PandarosWoWLogParser
         static void Main(string[] args)
         {
             var builder = new ContainerBuilder();
+            var logger = new PandaLogger("C:/temp/");
+            builder.RegisterInstance(logger).As<IPandaLogger>().SingleInstance();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
             builder.RegisterType<SwingDamageParser>().As<ICombatParser<SwingDamage>>().SingleInstance();
             builder.RegisterType<SpellFailedParser>().As<ICombatParser<SpellFailed>>().SingleInstance();
@@ -43,9 +45,35 @@ namespace PandarosWoWLogParser
                 new MonitoredZone()
                 {
                     ZoneName = "Serpentshrine Cavern",
-                    MonitoredFights = new List<string>()
+                    MonitoredFights = new Dictionary<string, List<string>>()
                     {
-                        "Lady Vashj"
+                        { "Lady Vashj", new List<string>() { "Lady Vashj", "Tainted Elementals", "Toxic Sporebat", "Coilfang Strider", "Coilfang Elite", "Enchanted Elemental" } },
+                        //{ "Lady Vashj", new List<string>() { "Lady Vashj" } },
+                        { "Hydross the Unstable", new List<string>() { "Hydross the Unstable" } },
+                        { "The Lurker Below", new List<string>() { "The Lurker Below" } },
+                        { "Leotheras the Blind", new List<string>() { "Leotheras the Blind" } },
+                        { "Fathom-Lord Karathress", new List<string>() { "Fathom-Guard Sharkkis", "Fathom-Guard Tidalvess", "Fathom-Guard Caribdis" } },
+                        { "Morogrim Tidewalker", new List<string>() { "Morogrim Tidewalker" } }
+                    }
+                },
+                new MonitoredZone()
+                {
+                    ZoneName = "Karazhan",
+                    MonitoredFights = new Dictionary<string, List<string>>()
+                    {
+                        { "Attumen the Huntsman", new List<string>() { "Attumen the Huntsman" } },
+                        { "Moroes", new List<string>() { "Moroes", "Lady Catriona Von'Indi", "Lady Keira Berrybuck", "Baroness Dorothea Millstipe", "Baron Rafe Dreuger", "Lord Robin Daris, Moroes", "Lord Crispin Ference" } },
+                        { "Maiden of Virtue", new List<string>() { "Maiden of Virtue" } },
+                        { "Opera House", new List<string>() { "Dorothee", "Tito", "Tinhead", "Strawman", "Roar", "Crone", "Big Bad Wolf", "Romulo", "Julianne" } },
+                        { "The Curator", new List<string>() { "The Curator" } },
+                        { "Terestian Illhoof", new List<string>() { "Terestian Illhoof", "Kil'rek" } },
+                        { "Shade of Aran", new List<string>() { "Shade of Aran" } },
+                        { "Netherspite", new List<string>() { "Netherspite" } },
+                        { "Prince Malchezaar", new List<string>() { "Prince Malchezaar" } },
+                        { "Nightbane", new List<string>() { "Nightbane" } },
+                        { "Rokad the Ravager", new List<string>() { "Rokad the Ravager" } },
+                        { "Shadikith the Glider", new List<string>() { "Shadikith the Glider" } },
+                        { "Hyakiss the Lurker", new List<string>() { "Hyakiss the Lurker" } }
                     }
                 }
             };
@@ -56,8 +84,8 @@ namespace PandarosWoWLogParser
 
             List<ICalculator> calculators = new List<ICalculator>()
             {
-                new TotalDamageCalculator(),
-                new HealingDoneCalculator()
+                new TotalDamageCalculator(logger),
+                new HealingDoneCalculator(logger)
             };
 
 
@@ -69,12 +97,12 @@ namespace PandarosWoWLogParser
 
             var clp = Container.Resolve<CombatLogParser>();
 
-            Console.WriteLine("Starting Parse.");
+            logger.Log("Starting Parse.");
             Stopwatch sw = new Stopwatch();
             sw.Start();
             var count = clp.ParseToEnd(@"C:\Program Files\Ascension Launcher\resources\client\Logs\WoWCombatLog.log");
             sw.Stop();
-            Console.WriteLine($"Parsed {count} events in {sw.Elapsed}.");
+            logger.Log($"Parsed {count} events in {sw.Elapsed}.");
 
         }
     }

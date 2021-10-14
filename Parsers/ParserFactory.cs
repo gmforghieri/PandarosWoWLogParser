@@ -68,6 +68,7 @@ namespace PandarosWoWLogParser.Parsers
             Parsers.Add(LogEvents.SPELL_DISPEL_FAILED, spellInterruptParser.Parse);
             Parsers.Add(LogEvents.SPELL_DRAIN, spellDrainParser.Parse);
             Parsers.Add(LogEvents.SPELL_LEECH, spellDrainParser.Parse);
+            Parsers.Add(LogEvents.SPELL_PERIODIC_LEECH, spellDrainParser.Parse);
             Parsers.Add(LogEvents.ENCHANT_REMOVED, enchantParser.Parse);
             Parsers.Add(LogEvents.ENCHANT_APPLIED, enchantParser.Parse);
         }

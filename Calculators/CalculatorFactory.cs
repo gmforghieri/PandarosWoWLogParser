@@ -9,9 +9,10 @@ namespace PandarosWoWLogParser.Calculators
     public class CalculatorFactory : ICalculatorFactory
     {
         public Dictionary<string, List<ICalculator>> Calculators { get; set; } = new Dictionary<string, List<ICalculator>>();
-
+        public List<ICalculator> CalculatorFlatList { get; set; }
         public CalculatorFactory(List<ICalculator> calculators)
         {
+            CalculatorFlatList = calculators;
             foreach (var calc in calculators)
                 foreach(var evnt in calc.ApplicableEvents)
                 {
@@ -31,24 +32,21 @@ namespace PandarosWoWLogParser.Calculators
 
         public void FinalizeCalculations()
         {
-            foreach (var calcKvp in Calculators)
-                foreach (var calc in calcKvp.Value)
-                    calc.FinalizeCalculations();
+            foreach (var calc in CalculatorFlatList)
+                calc.FinalizeCalculations();
         }
 
 
         public void StartFight(MonitoredFight fight)
         {
-            foreach (var calcKvp in Calculators)
-                foreach (var calc in calcKvp.Value)
-                    calc.StartFight(fight);
+            foreach (var calc in CalculatorFlatList)
+                calc.StartFight(fight);
         }
 
         public void FinalizeFight(MonitoredFight fight)
         {
-            foreach (var calcKvp in Calculators)
-                foreach (var calc in calcKvp.Value)
-                    calc.FinalizeFight(fight);
+            foreach (var calc in CalculatorFlatList)
+                calc.FinalizeFight(fight);
         }
     }
 }

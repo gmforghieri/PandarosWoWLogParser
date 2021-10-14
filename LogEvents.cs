@@ -30,6 +30,7 @@ namespace PandarosWoWLogParser
         public const string SPELL_INSTAKILL = "SPELL_INSTAKILL";
         public const string SPELL_DRAIN = "SPELL_DRAIN";
         public const string SPELL_LEECH = "SPELL_LEECH";
+        public const string SPELL_PERIODIC_LEECH = "SPELL_PERIODIC_LEECH";
         public const string SPELL_DURABILITY_DAMAGE = "SPELL_DURABILITY_DAMAGE";
         public const string SPELL_DURABILITY_DAMAGE_ALL = "SPELL_DURABILITY_DAMAGE_ALL";
         public const string SPELL_DISPEL = "SPELL_DISPEL";

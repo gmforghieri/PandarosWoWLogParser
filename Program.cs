@@ -42,10 +42,10 @@ namespace PandarosWoWLogParser
             {
                 new MonitoredZone()
                 {
-                    ZoneName = "Test",
+                    ZoneName = "Serpentshrine Cavern",
                     MonitoredFights = new List<string>()
                     {
-                        "Watchkeeper Gargolmar"
+                        "Lady Vashj"
                     }
                 }
             };
@@ -56,7 +56,8 @@ namespace PandarosWoWLogParser
 
             List<ICalculator> calculators = new List<ICalculator>()
             {
-                new TotalDamageCalculator()
+                new TotalDamageCalculator(),
+                new HealingDoneCalculator()
             };
 
 

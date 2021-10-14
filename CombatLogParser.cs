@@ -62,10 +62,13 @@ namespace PandarosWoWLogParser
 
                         if (evt == null)
                         {
-                            if (!unknown.TryGetValue(evtStr, out int val))
-                                unknown.Add(evtStr, 1);
-                            else
-                                unknown[evtStr] = val + 1;
+                            if (!string.IsNullOrEmpty(evtStr))
+                            {
+                                if (!unknown.TryGetValue(evtStr, out int val))
+                                    unknown.Add(evtStr, 1);
+                                else
+                                    unknown[evtStr] = val + 1;
+                            }
                         }
                         else
                         {
@@ -125,6 +128,8 @@ namespace PandarosWoWLogParser
                 Console.WriteLine($"{ev.Key}: {ev.Value}");
             Console.WriteLine($"``````````````````````````````````````````````````````````````");
 
+            _calculatorFactory.FinalizeCalculations();
+
             return count;
         }
 
@@ -137,9 +142,8 @@ namespace PandarosWoWLogParser
 
             if (collection.Count != 9)
             {
-                Exception e = new Exception("Error parsing line");
-                e.Data["line"] = line;
-                throw e;
+                evt = string.Empty;
+                return null;
             }
 
             string month = collection[1].Value;

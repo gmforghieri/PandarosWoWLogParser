@@ -23,10 +23,11 @@ namespace PandarosWoWLogParser.FightMonitor
 
                 if (ts.TotalSeconds > 120)
                 {
-                    for(int i = MonitoredFightEvents.Count -1; i == 0; i--)
+                    for(int i = MonitoredFightEvents.Count -1; i != 0; i--)
                     {
-                        if (combatEvent.DestName == MonsterName)
+                        if (MonitoredFightEvents[i].DestName == MonsterName || MonitoredFightEvents[i].SourceName == MonsterName)
                         {
+                            FightEnd = MonitoredFightEvents[i].Timestamp;
                             break;
                         }
                         else

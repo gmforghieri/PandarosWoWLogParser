@@ -16,8 +16,12 @@ namespace PandarosWoWLogParser.Parsers
         {
             obj = (Enchant)base.Parse(timestamp, eventName, eventData, obj);
             obj.SpellName = eventData[Indexes.ENCHANT.SpellName];
-            obj.ItemID = eventData[Indexes.ENCHANT.ItemID].ToInt();
-            obj.ItemName = eventData[Indexes.ENCHANT.ItemName];
+
+            if (eventData.Length > Indexes.ENCHANT.ItemID)
+            {
+                obj.ItemID = eventData[Indexes.ENCHANT.ItemID].ToInt();
+                obj.ItemName = eventData[Indexes.ENCHANT.ItemName];
+            }
             return obj;
         }
     }

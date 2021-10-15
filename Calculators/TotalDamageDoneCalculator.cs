@@ -7,15 +7,13 @@ using System.Linq;
 
 namespace PandarosWoWLogParser.Calculators
 {
-    public class TotalDamageCalculator : ICalculator
+    public class TotalDamageDoneCalculator : ICalculator
     {
         Dictionary<string, long> _damageDoneByPlayersTotal = new Dictionary<string, long>();
         Dictionary<string, long> _damageDoneByPlayersFight = new Dictionary<string, long>();
-        Dictionary<string, long> _damageDoneByNPCTotal = new Dictionary<string, long>();
-        Dictionary<string, Dictionary<SpellSchool, long>> _damageDoneBySchoolTotal = new Dictionary<string, Dictionary<SpellSchool, long>>();
         IPandaLogger _logger;
 
-        public TotalDamageCalculator(IPandaLogger logger)
+        public TotalDamageDoneCalculator(IPandaLogger logger)
         {
             _logger = logger;
         }
@@ -61,7 +59,7 @@ namespace PandarosWoWLogParser.Calculators
         {
             int i = 0;
             _logger.Log("---------------------------------------------");
-            _logger.Log("DPS Rankings");
+            _logger.Log("Damage Rankings");
             _logger.Log("---------------------------------------------");
             foreach (var person in _damageDoneByPlayersTotal.OrderBy(i => i.Value).Reverse())
             {
@@ -74,13 +72,24 @@ namespace PandarosWoWLogParser.Calculators
         public void FinalizeFight(MonitoredFight fight, CombatState state)
         {
             int i = 0;
+            var ts = fight.FightEnd.Subtract(fight.FightStart);
+            _logger.Log("---------------------------------------------");
+            _logger.Log($"Damage Rankings: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            _logger.Log("---------------------------------------------");
+            foreach (var person in _damageDoneByPlayersFight.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                _logger.Log($"{i}. {person.Key}: {person.Value.ToString("N")}");
+            }
+            _logger.Log("---------------------------------------------");
+
             _logger.Log("---------------------------------------------");
             _logger.Log($"DPS Rankings: {fight.CurrentZone.ZoneName} - {fight.BossName}");
             _logger.Log("---------------------------------------------");
             foreach (var person in _damageDoneByPlayersFight.OrderBy(i => i.Value).Reverse())
             {
                 i++;
-                _logger.Log($"{i}. {person.Key}: {person.Value.ToString("N")}");
+                _logger.Log($"{i}. {person.Key}: {(person.Value / ts.TotalSeconds).ToString("N")}");
             }
             _logger.Log("---------------------------------------------");
         }

@@ -48,7 +48,6 @@ namespace PandarosWoWLogParser
                     MonitoredFights = new Dictionary<string, List<string>>()
                     {
                         { "Lady Vashj", new List<string>() { "Lady Vashj", "Tainted Elementals", "Toxic Sporebat", "Coilfang Strider", "Coilfang Elite", "Enchanted Elemental" } },
-                        //{ "Lady Vashj", new List<string>() { "Lady Vashj" } },
                         { "Hydross the Unstable", new List<string>() { "Hydross the Unstable" } },
                         { "The Lurker Below", new List<string>() { "The Lurker Below" } },
                         { "Leotheras the Blind", new List<string>() { "Leotheras the Blind" } },
@@ -75,6 +74,14 @@ namespace PandarosWoWLogParser
                         { "Shadikith the Glider", new List<string>() { "Shadikith the Glider" } },
                         { "Hyakiss the Lurker", new List<string>() { "Hyakiss the Lurker" } }
                     }
+                },
+                new MonitoredZone()
+                {
+                    ZoneName = "Shattered Halls",
+                    MonitoredFights = new Dictionary<string, List<string>>()
+                    {
+                        { "Warchief Kargath Bladefist", new List<string>() { "Warchief Kargath Bladefist" } }
+                    }
                 }
             };
 
@@ -84,7 +91,7 @@ namespace PandarosWoWLogParser
 
             List<ICalculator> calculators = new List<ICalculator>()
             {
-                new TotalDamageCalculator(logger),
+                new TotalDamageDoneCalculator(logger),
                 new HealingDoneCalculator(logger)
             };
 
@@ -103,7 +110,7 @@ namespace PandarosWoWLogParser
             var count = clp.ParseToEnd(@"C:\Program Files\Ascension Launcher\resources\client\Logs\WoWCombatLog.log");
             sw.Stop();
             logger.Log($"Parsed {count} events in {sw.Elapsed}.");
-
+            Thread.Sleep(1000);
         }
     }
 }

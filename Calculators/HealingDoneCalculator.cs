@@ -134,6 +134,7 @@ namespace PandarosWoWLogParser.Calculators
         public void FinalizeFight(MonitoredFight fight, CombatState state)
         {
             int i = 0;
+            var ts = fight.FightEnd.Subtract(fight.FightStart);
             _logger.Log("---------------------------------------------");
             _logger.Log($"Healing Rankings {fight.CurrentZone.ZoneName}: {fight.BossName} (Overheal_Life) [Healed])");
             _logger.Log("---------------------------------------------");
@@ -143,6 +144,15 @@ namespace PandarosWoWLogParser.Calculators
                 _overHealingDoneByPlayersFight.TryGetValue(person.Key, out var overheal);
                 _normalDoneByPlayersFight.TryGetValue(person.Key, out var goodHeal);
                 _logger.Log($"{i}. {person.Key}: {person.Value.ToString("N")} ({overheal.ToString("N")}) [{goodHeal.ToString("N")}]");
+            }
+
+            _logger.Log("---------------------------------------------");
+            _logger.Log($"HPS Rankings {fight.CurrentZone.ZoneName}: {fight.BossName}");
+            _logger.Log("---------------------------------------------");
+            foreach (var person in _healingDoneByPlayersFight.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                _logger.Log($"{i}. {person.Key}: {(person.Value / ts.TotalSeconds).ToString("N")}");
             }
             i = 0;
             _logger.Log("---------------------------------------------");

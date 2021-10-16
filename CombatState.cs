@@ -17,14 +17,11 @@ namespace PandarosWoWLogParser
 
         public void ProcessCombatEvent(ICombatEvent combatEvent)
         {
-            if (combatEvent.SourceName != "nil" && !EntityIdToNameMap.ContainsKey(combatEvent.SourceGuid))
-                EntityIdToNameMap.Add(combatEvent.SourceGuid, combatEvent.SourceName);
-
             if (!EntityIdToNameMap.ContainsKey(combatEvent.DestGuid))
             {
                 EntityIdToNameMap.Add(combatEvent.DestGuid, combatEvent.DestName);
 
-                if (combatEvent.EventName == LogEvents.SPELL_SUMMON)
+                if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceName != "nil")
                 {
                     if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceGuid, out var list))
                     {

@@ -80,7 +80,6 @@ namespace PandarosWoWLogParser
                             else
                                 eventCount[evt.EventName] = val + 1;
 
-                            state.ProcessCombatEvent(evt);
                             if (_fightMonitorFactory.IsMonitoredFight(evt, state))
                             {
                                 isInFight = true;
@@ -94,17 +93,26 @@ namespace PandarosWoWLogParser
                                     _calculatorFactory.StartFight(fight, state);
 
                                     foreach (var fightEvent in fight.MonitoredFightEvents)
+                                    {
+                                        state.ProcessCombatEvent(fightEvent);
                                         _calculatorFactory.CalculateEvent(fightEvent, state);
+                                    }
 
                                     _calculatorFactory.FinalizeFight(fight, state);
 
                                     foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
+                                    {
+                                        state.ProcessCombatEvent(unmonitoredEvent);
                                         _calculatorFactory.CalculateEvent(unmonitoredEvent, state);
+                                    }
 
                                     isInFight = false;
-                                }  
+                                }
                                 else
+                                {
+                                    state.ProcessCombatEvent(evt);
                                     _calculatorFactory.CalculateEvent(evt, state);
+                                }
                             }
                         }
 

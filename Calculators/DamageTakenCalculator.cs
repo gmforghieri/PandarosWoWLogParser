@@ -21,6 +21,11 @@ namespace PandarosWoWLogParser.Calculators
         public void CalculateEvent(ICombatEvent combatEvent, CombatState state)
         {
             var damage = (IDamage)combatEvent;
+
+            if (combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Npc)
+            {
+
+            }
         }
 
         public void FinalizeCalculations(CombatState state)

@@ -92,7 +92,8 @@ namespace PandarosWoWLogParser
             List<ICalculator> calculators = new List<ICalculator>()
             {
                 new TotalDamageDoneCalculator(logger),
-                new HealingDoneCalculator(logger)
+                new HealingDoneCalculator(logger),
+                new HealingDoneBySpellCalculator(logger)
             };
 
 

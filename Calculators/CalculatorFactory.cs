@@ -55,7 +55,7 @@ namespace PandarosWoWLogParser.Calculators
             state.InFight = true;
             _eventCount.Clear();
             _logger.Log("---------------------------------------------");
-            _logger.Log($"{fight.FightStart} Fight Start: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            _logger.Log($"{fight.FightStart.ToLocalTime()} Fight Start: {fight.CurrentZone.ZoneName} - {fight.BossName}");
             _logger.Log("---------------------------------------------");
             foreach (var calc in CalculatorFlatList)
                 calc.StartFight(fight, state);
@@ -69,7 +69,7 @@ namespace PandarosWoWLogParser.Calculators
 
 
             _logger.Log("---------------------------------------------");
-            _logger.Log($"{fight.FightEnd} Fight End: {fight.CurrentZone.ZoneName} - {fight.BossName} ({fight.FightEnd.Subtract(fight.FightStart)})");
+            _logger.Log($"{fight.FightEnd.ToLocalTime()} Fight End: {fight.CurrentZone.ZoneName} - {fight.BossName} ({fight.FightEnd.Subtract(fight.FightStart)})");
             foreach (var ev in _eventCount)
                 _logger.Log($"{ev.Key}: {ev.Value}");
             _logger.Log("---------------------------------------------");

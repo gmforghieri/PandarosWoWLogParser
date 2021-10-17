@@ -2,6 +2,8 @@
 using PandarosWoWLogParser.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace PandarosWoWLogParser.Calculators
@@ -9,16 +11,30 @@ namespace PandarosWoWLogParser.Calculators
     public class CalculatorFactory : ICalculatorFactory
     {
         public Dictionary<string, List<ICalculator>> Calculators { get; set; } = new Dictionary<string, List<ICalculator>>();
-        public List<ICalculator> CalculatorFlatList { get; set; }
+        public List<ICalculator> CalculatorFlatList { get; set; } = new List<ICalculator>();
+        public CombatState State { get; set; }
+        public MonitoredFight Fight { get; set; }
         Dictionary<string, int> _eventCount = new Dictionary<string, int>();
         IPandaLogger _logger;
+        IStatsReporter _reporter;
 
-        public CalculatorFactory(List<ICalculator> calculators, IPandaLogger logger)
+
+        public CalculatorFactory(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight)
         {
-            CalculatorFlatList = calculators;
+            var assem = Assembly.GetExecutingAssembly();
             _logger = logger;
+            _reporter = reporter;
+            State = state;
+            Fight = fight;
+            var typeArray = assem.GetTypes();
 
-            foreach (var calc in calculators)
+            foreach (var type in typeArray)
+            {
+                if (type.GetInterfaces().Any(i => i == typeof(ICalculator)) && !type.IsAbstract)
+                    CalculatorFlatList.Add(Activator.CreateInstance(type, logger, _reporter, state, fight) as ICalculator);
+            }
+
+            foreach (var calc in CalculatorFlatList)
                 foreach(var evnt in calc.ApplicableEvents)
                 {
                     if (Calculators.TryGetValue(evnt, out var list))
@@ -28,9 +44,9 @@ namespace PandarosWoWLogParser.Calculators
                 }
         }
 
-        public void CalculateEvent(ICombatEvent combatEvent, CombatState state)
+        public void CalculateEvent(ICombatEvent combatEvent)
         {
-            if (state.InFight)
+            if (State.InFight)
             {
                 if (!_eventCount.TryGetValue(combatEvent.EventName, out int val))
                     _eventCount[combatEvent.EventName] = 1;
@@ -40,35 +56,29 @@ namespace PandarosWoWLogParser.Calculators
 
             if (Calculators.TryGetValue(combatEvent.EventName, out var calcList))
                 foreach (var calc in calcList)
-                    calc.CalculateEvent(combatEvent, state);
-        }
-
-        public void FinalizeCalculations(CombatState state)
-        {
-            foreach (var calc in CalculatorFlatList)
-                calc.FinalizeCalculations(state);
+                    calc.CalculateEvent(combatEvent);
         }
 
 
-        public void StartFight(MonitoredFight fight, CombatState state)
+        public void StartFight()
         {
-            state.InFight = true;
+            State.InFight = true;
             _eventCount.Clear();
             _logger.Log("---------------------------------------------");
-            _logger.Log($"{fight.FightStart.ToLocalTime()} Fight Start: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            _logger.Log($"{Fight.FightStart.ToLocalTime()} Fight Start: {Fight.CurrentZone.ZoneName} - {Fight.BossName}");
             _logger.Log("---------------------------------------------");
             foreach (var calc in CalculatorFlatList)
-                calc.StartFight(fight, state);
+                calc.StartFight();
         }
 
-        public void FinalizeFight(MonitoredFight fight, CombatState state)
+        public void FinalizeFight()
         {
-            state.InFight = false;
+            State.InFight = false;
             foreach (var calc in CalculatorFlatList)
-                calc.FinalizeFight(fight, state);
+                calc.FinalizeFight();
 
             _logger.Log("---------------------------------------------");
-            _logger.Log($"{fight.FightEnd.ToLocalTime()} Fight End: {fight.CurrentZone.ZoneName} - {fight.BossName} ({fight.FightEnd.Subtract(fight.FightStart)})");
+            _logger.Log($"{Fight.FightEnd.ToLocalTime()} Fight End: {Fight.CurrentZone.ZoneName} - {Fight.BossName} ({Fight.FightEnd.Subtract(Fight.FightStart)})");
             foreach (var ev in _eventCount)
                 _logger.Log($"{ev.Key}: {ev.Value}");
             _logger.Log("---------------------------------------------");

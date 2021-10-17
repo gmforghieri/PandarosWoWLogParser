@@ -1,4 +1,5 @@
-﻿using PandarosWoWLogParser.Models;
+﻿using PandarosWoWLogParser.Calculators;
+using PandarosWoWLogParser.Models;
 using System;
 using System.Collections.Generic;
 
@@ -11,7 +12,7 @@ namespace PandarosWoWLogParser.FightMonitor
         Dictionary<string, Tuple<string, MonitoredZone>> MonitoredBosses { get; set; }
         List<MonitoredZone> MonitoredZones { get; set; }
 
-        MonitoredFight GetFight();
+        Tuple<MonitoredFight, ICalculatorFactory> GetFight();
         bool IsMonitoredFight(ICombatEvent evnt, CombatState state);
     }
 }

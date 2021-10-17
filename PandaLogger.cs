@@ -316,19 +316,6 @@ namespace PandarosWoWLogParser
                 Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({Math.Round(kvp.Value / (double)total, 2) * 100 }%)");
             }
         }
-
-        public void Report(Dictionary<string, long> stats, string name, CombatState state)
-        {
-            int i = 0;
-            Log("---------------------------------------------");
-            Log(name);
-            Log("---------------------------------------------");
-            foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
-            {
-                i++;
-                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")}");
-            }
-        }
     }
 }
 

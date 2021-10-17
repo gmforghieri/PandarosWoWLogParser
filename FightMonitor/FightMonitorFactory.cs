@@ -1,4 +1,5 @@
-﻿using PandarosWoWLogParser.Models;
+﻿using PandarosWoWLogParser.Calculators;
+using PandarosWoWLogParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,15 @@ namespace PandarosWoWLogParser.FightMonitor
         public bool IsInFight { get; set; }
 
         public MonitoredFight CurrentFight { get; set; }
+        IPandaLogger _logger;
+        IStatsReporter _reporter;
+        ICalculatorFactory _calculatorFactory;
 
-        public FightMonitorFactory(List<MonitoredZone> monitoredZones)
+        public FightMonitorFactory(List<MonitoredZone> monitoredZones, IPandaLogger logger, IStatsReporter reporter)
         {
             MonitoredZones = monitoredZones;
+            _reporter = reporter;
+            _logger = logger;
 
             foreach (var zone in monitoredZones)
                 foreach (var bossList in zone.MonitoredFights)
@@ -51,6 +57,7 @@ namespace PandarosWoWLogParser.FightMonitor
                         FightStart = evnt.Timestamp,
                         MonsterID = new Dictionary<string, bool>() { { evnt.DestName, false } }
                     };
+                    _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, CurrentFight);
                 }
                 else if (MonitoredBosses.ContainsKey(evnt.SourceName))
                 {
@@ -62,6 +69,7 @@ namespace PandarosWoWLogParser.FightMonitor
                         FightStart = evnt.Timestamp,
                         MonsterID = new Dictionary<string, bool>() { { evnt.SourceName, false } }
                     };
+                    _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, CurrentFight);
                 }
             }
 
@@ -70,12 +78,13 @@ namespace PandarosWoWLogParser.FightMonitor
                 IsInFight = CurrentFight.AddEvent(evnt, state);
             }
 
+
             return IsInFight;
         }
 
-        public MonitoredFight GetFight()
+        public Tuple<MonitoredFight, ICalculatorFactory> GetFight()
         {
-            var retval = CurrentFight;
+            var retval = Tuple.Create(CurrentFight, _calculatorFactory);
             CurrentFight = null;
             return retval;
         }

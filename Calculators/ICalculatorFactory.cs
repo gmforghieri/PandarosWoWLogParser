@@ -9,13 +9,12 @@ namespace PandarosWoWLogParser.Calculators
     public interface ICalculatorFactory
     {
         public Dictionary<string, List<ICalculator>> Calculators { get; set; }
+        public CombatState State { get; set; }
+        public MonitoredFight Fight { get; set; }
+        public void CalculateEvent(ICombatEvent combatEvent);
 
-        public void CalculateEvent(ICombatEvent combatEvent, CombatState state);
+        public void StartFight();
 
-        public void FinalizeCalculations(CombatState state);
-
-        public void StartFight(MonitoredFight fight, CombatState state);
-
-        public void FinalizeFight(MonitoredFight fight, CombatState state);
+        public void FinalizeFight();
     }
 }

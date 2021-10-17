@@ -18,16 +18,16 @@ namespace PandarosWoWLogParser
         public FileInfo FileInfo { get; private set; }
 
         IParserFactory _parserFactory;
-        ICalculatorFactory _calculatorFactory;
         IFightMonitorFactory _fightMonitorFactory;
         IPandaLogger _logger;
+        IStatsReporter _reporter;
 
-        public CombatLogParser(IParserFactory parserFactory, ICalculatorFactory calculatorFactory, IFightMonitorFactory fightMonitorFactory, IPandaLogger logger)
+        public CombatLogParser(IParserFactory parserFactory, IFightMonitorFactory fightMonitorFactory, IPandaLogger logger, IStatsReporter reporter)
         {
             _parserFactory = parserFactory;
-            _calculatorFactory = calculatorFactory;
             _fightMonitorFactory = fightMonitorFactory;
             _logger = logger;
+            _reporter = reporter;
         }
 
         public int ParseToEnd(string filepath)
@@ -50,6 +50,17 @@ namespace PandarosWoWLogParser
             Dictionary<string, int> eventCount = new Dictionary<string, int>();
             bool isInFight = false;
             CombatState state = new CombatState();
+            MonitoredFight allFights = new MonitoredFight()
+            {
+                CurrentZone = new MonitoredZone()
+                {
+                    ZoneName = "All",
+                    MonitoredFights = new Dictionary<string, List<string>>()
+                },
+                BossName = "All Fights in Log"
+            };
+
+            ICalculatorFactory _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, allFights);
 
             using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -66,54 +77,44 @@ namespace PandarosWoWLogParser
                         if (evt == null)
                         {
                             if (!string.IsNullOrEmpty(evtStr))
-                            {
-                                if (!unknown.TryGetValue(evtStr, out int val))
-                                    unknown.Add(evtStr, 1);
-                                else
-                                    unknown[evtStr] = val + 1;
-                            }
+                                unknown.AddValue(evtStr, 1);
                         }
                         else
                         {
-                            if (!eventCount.TryGetValue(evt.EventName, out int val))
-                                eventCount[evt.EventName] = 1;
-                            else
-                                eventCount[evt.EventName] = val + 1;
+                            eventCount.AddValue(evt.EventName, 1);
 
                             if (_fightMonitorFactory.IsMonitoredFight(evt, state))
-                            {
                                 isInFight = true;
+                            else if (isInFight)
+                            {
+                                var tpl = _fightMonitorFactory.GetFight();
+                                var fight = tpl.Item1;
+                                var factory = tpl.Item2;
+
+                                factory.StartFight();
+
+                                foreach (var fightEvent in fight.MonitoredFightEvents)
+                                {
+                                    state.ProcessCombatEvent(fightEvent);
+                                    factory.CalculateEvent(fightEvent);
+                                }
+
+                                factory.FinalizeFight();
+
+                                foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
+                                {
+                                    state.ProcessCombatEvent(unmonitoredEvent);
+                                    _calculatorFactory.CalculateEvent(unmonitoredEvent);
+                                }
+
+                                isInFight = false;
                             }
                             else
                             {
-                                if (isInFight)
-                                {
-                                    var fight = _fightMonitorFactory.GetFight();
-
-                                    _calculatorFactory.StartFight(fight, state);
-
-                                    foreach (var fightEvent in fight.MonitoredFightEvents)
-                                    {
-                                        state.ProcessCombatEvent(fightEvent);
-                                        _calculatorFactory.CalculateEvent(fightEvent, state);
-                                    }
-
-                                    _calculatorFactory.FinalizeFight(fight, state);
-
-                                    foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
-                                    {
-                                        state.ProcessCombatEvent(unmonitoredEvent);
-                                        _calculatorFactory.CalculateEvent(unmonitoredEvent, state);
-                                    }
-
-                                    isInFight = false;
-                                }
-                                else
-                                {
-                                    state.ProcessCombatEvent(evt);
-                                    _calculatorFactory.CalculateEvent(evt, state);
-                                }
+                                state.ProcessCombatEvent(evt);
+                                _calculatorFactory.CalculateEvent(evt);
                             }
+                            
                         }
 
                         long cur = fs.Position;
@@ -126,6 +127,7 @@ namespace PandarosWoWLogParser
 
                 }
             }
+
             IsParsing = false;
             _logger.Log($"``````````````````````````````````````````````````````````````");
             _logger.Log($"Number of unknown events: {unknown.Count}");
@@ -140,7 +142,7 @@ namespace PandarosWoWLogParser
                 _logger.Log($"{ev.Key}: {ev.Value}");
             _logger.Log($"``````````````````````````````````````````````````````````````");
 
-            _calculatorFactory.FinalizeCalculations(state);
+            _calculatorFactory.FinalizeFight();
 
             return count;
         }

@@ -9,32 +9,31 @@ namespace PandarosWoWLogParser.Calculators
     public abstract class BaseCalculator : ICalculator
     {
         public List<string> ApplicableEvents { get; set; }
+        public CombatState State { get; set; }
+        public MonitoredFight Fight { get; set; }
 
         internal IPandaLogger _logger;
-        internal IStatsReporting _statsReporting;
+        internal IStatsReporter _statsReporting;
 
-        public BaseCalculator(IPandaLogger logger, IStatsReporting reporter)
+        public BaseCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight)
         {
             _logger = logger;
             _statsReporting = reporter;
+            State = state;
+            Fight = fight;
         }
 
-        public virtual void CalculateEvent(ICombatEvent combatEvent, CombatState state)
+        public virtual void CalculateEvent(ICombatEvent combatEvent)
         {
             
         }
 
-        public virtual void FinalizeCalculations(CombatState state)
+        public virtual void FinalizeFight()
         {
             
         }
 
-        public virtual void FinalizeFight(MonitoredFight fight, CombatState state)
-        {
-            
-        }
-
-        public virtual void StartFight(MonitoredFight fight, CombatState state)
+        public virtual void StartFight()
         {
             
         }

@@ -20,6 +20,7 @@ namespace PandarosWoWLogParser
             var builder = new ContainerBuilder();
             var logger = new PandaLogger("C:/temp/");
             builder.RegisterInstance(logger).As<IPandaLogger>().SingleInstance();
+            builder.RegisterInstance(logger).As<IStatsReporter>().SingleInstance();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
             builder.RegisterType<SwingDamageParser>().As<ICombatParser<SwingDamage>>().SingleInstance();
             builder.RegisterType<SpellFailedParser>().As<ICombatParser<SpellFailed>>().SingleInstance();
@@ -87,18 +88,6 @@ namespace PandarosWoWLogParser
 
             builder.RegisterInstance(monitoredZones);
             builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>().SingleInstance();
-
-
-            List<ICalculator> calculators = new List<ICalculator>()
-            {
-                new TotalDamageDoneCalculator(logger, logger),
-                new HealingDoneCalculator(logger, logger),
-                new HealingDoneBySpellCalculator(logger)
-            };
-
-
-            builder.RegisterInstance(calculators);
-            builder.RegisterType<CalculatorFactory>().As<ICalculatorFactory>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
 
             Container = builder.Build();

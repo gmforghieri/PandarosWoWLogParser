@@ -10,9 +10,8 @@ namespace PandarosWoWLogParser.Calculators
     public class TotalDamageDoneCalculator : BaseCalculator
     {
         Dictionary<string, long> _damageDoneByPlayersTotal = new Dictionary<string, long>();
-        Dictionary<string, long> _damageDoneByPlayersFight = new Dictionary<string, long>();
 
-        public TotalDamageDoneCalculator(IPandaLogger logger, IStatsReporting reporter) : base(logger, reporter)
+        public TotalDamageDoneCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
             {
@@ -23,35 +22,25 @@ namespace PandarosWoWLogParser.Calculators
             };
         }
 
-        public override void CalculateEvent(ICombatEvent combatEvent, CombatState state)
+        public override void CalculateEvent(ICombatEvent combatEvent)
         {
+            if (combatEvent.SourceFlags.GetFlagType() != UnitFlags.FlagType.Player)
+                return;
+
             var damage = (IDamage)combatEvent;
 
-            if (combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player)
-            {
-                _damageDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Damage);
-            }
-
-            if (state.InFight && combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player)
-            {
-                _damageDoneByPlayersFight.AddValue(combatEvent.SourceName, damage.Damage);
-            }
+            _damageDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Damage);
         }
 
-        public override void FinalizeCalculations(CombatState state)
+        public override void FinalizeFight()
         {
-            _statsReporting.Report(_damageDoneByPlayersTotal, "Damage Rankings", state);
+            _statsReporting.Report(_damageDoneByPlayersTotal, "Damage Rankings", Fight, State);
+            _statsReporting.ReportPerSecondNumbers(_damageDoneByPlayersTotal, "DPS Rankings", Fight, State);
         }
 
-        public override void FinalizeFight(MonitoredFight fight, CombatState state)
+        public override void StartFight()
         {
-            _statsReporting.Report(_damageDoneByPlayersFight, "Damage Rankings", fight, state);
-            _statsReporting.ReportPerSecondNumbers(_damageDoneByPlayersFight, "DPS Rankings", fight, state);
-        }
-
-        public override void StartFight(MonitoredFight fight, CombatState state)
-        {
-            _damageDoneByPlayersFight.Clear();
+            
         }
     }
 }

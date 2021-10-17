@@ -12,10 +12,7 @@ namespace PandarosWoWLogParser.Calculators
         Dictionary<string, long> _healingDoneByPlayersTotal = new Dictionary<string, long>();
         Dictionary<string, long> _overHealingDoneByPlayersTotal = new Dictionary<string, long>();
 
-        Dictionary<string, long> _healingDoneByPlayersFight = new Dictionary<string, long>();
-        Dictionary<string, long> _overHealingDoneByPlayersFight = new Dictionary<string, long>();
-
-        public HealingDoneCalculator(IPandaLogger logger, IStatsReporting reporter) : base(logger, reporter)
+        public HealingDoneCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
         {
@@ -24,7 +21,7 @@ namespace PandarosWoWLogParser.Calculators
         };
         }
 
-        public override void CalculateEvent(ICombatEvent combatEvent, CombatState state)
+        public override void CalculateEvent(ICombatEvent combatEvent)
         {
             var damage = (ISpellHeal)combatEvent;
 
@@ -32,32 +29,19 @@ namespace PandarosWoWLogParser.Calculators
             {
                 _healingDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.HealAmount);
                 _overHealingDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Overhealing);
-
-                if (state.InFight)
-                {
-                    _healingDoneByPlayersFight.AddValue(combatEvent.SourceName, damage.HealAmount);
-                    _overHealingDoneByPlayersFight.AddValue(combatEvent.SourceName, damage.Overhealing);
-                }
             }
         }
 
-        public override void FinalizeCalculations(CombatState state)
+        public override void FinalizeFight()
         {
-            _statsReporting.Report(_healingDoneByPlayersTotal, "Healing Rankings Total", state);
-            _statsReporting.Report(_overHealingDoneByPlayersTotal, "Overhealed Rankings Total", state);
+            _statsReporting.Report(_healingDoneByPlayersTotal, "Healing Rankings", Fight, State);
+            _statsReporting.Report(_overHealingDoneByPlayersTotal, "Overhealed Rankings", Fight, State);
+            _statsReporting.ReportPerSecondNumbers(_healingDoneByPlayersTotal, "HPS Rankings", Fight, State);
         }
 
-        public override void FinalizeFight(MonitoredFight fight, CombatState state)
+        public override void StartFight()
         {
-            _statsReporting.Report(_healingDoneByPlayersFight, "Healing Rankings", fight, state);
-            _statsReporting.Report(_overHealingDoneByPlayersFight, "Overhealed Rankings", fight, state);
-            _statsReporting.ReportPerSecondNumbers(_healingDoneByPlayersFight, "HPS Rankings", fight, state);
-        }
 
-        public override void StartFight(MonitoredFight fight, CombatState state)
-        {
-            _overHealingDoneByPlayersFight.Clear();
-            _healingDoneByPlayersFight.Clear();
         }
     }
 }

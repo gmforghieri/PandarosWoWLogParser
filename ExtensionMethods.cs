@@ -78,6 +78,18 @@ namespace PandarosWoWLogParser
             }
         }
 
+        public static void AddValue(this Dictionary<string, int> dic, string key, int value)
+        {
+            if (dic.TryGetValue(key, out int existingVal))
+            {
+                dic[key] = existingVal + value;
+            }
+            else
+            {
+                dic[key] = value;
+            }
+        }
+
         public static void AddValue(this Dictionary<string, Dictionary<string, long>> dic, string key, string key2, long value)
         {
             if (!dic.TryGetValue(key, out Dictionary<string, long> dic2))

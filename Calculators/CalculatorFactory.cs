@@ -67,7 +67,6 @@ namespace PandarosWoWLogParser.Calculators
             foreach (var calc in CalculatorFlatList)
                 calc.FinalizeFight(fight, state);
 
-
             _logger.Log("---------------------------------------------");
             _logger.Log($"{fight.FightEnd.ToLocalTime()} Fight End: {fight.CurrentZone.ZoneName} - {fight.BossName} ({fight.FightEnd.Subtract(fight.FightStart)})");
             foreach (var ev in _eventCount)

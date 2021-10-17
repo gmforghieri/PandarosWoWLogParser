@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PandarosWoWLogParser.FightMonitor;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -284,6 +285,49 @@ namespace PandarosWoWLogParser
                 }
             }
             return filenum;
+        }
+
+        public void ReportPerSecondNumbers(Dictionary<string, long> stats, string name, MonitoredFight fight, CombatState state)
+        {
+            int i = 0;
+            var ts = fight.FightEnd.Subtract(fight.FightStart);
+            Log("---------------------------------------------");
+            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log("---------------------------------------------");
+            foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                Log($"{i}. {kvp.Key}: {(kvp.Value / ts.TotalSeconds).ToString("N")}");
+            }
+            Log("---------------------------------------------");
+        }
+
+        public void Report(Dictionary<string, long> stats, string name, MonitoredFight fight, CombatState state)
+        {
+            int i = 0;
+            var ts = fight.FightEnd.Subtract(fight.FightStart);
+            var total = stats.Sum(kvp => kvp.Value);
+            Log("---------------------------------------------");
+            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log("---------------------------------------------");
+            foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({Math.Round(kvp.Value / (double)total, 2) * 100 }%)");
+            }
+        }
+
+        public void Report(Dictionary<string, long> stats, string name, CombatState state)
+        {
+            int i = 0;
+            Log("---------------------------------------------");
+            Log(name);
+            Log("---------------------------------------------");
+            foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")}");
+            }
         }
     }
 }

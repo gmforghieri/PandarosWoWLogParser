@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using CombatLogParser;
 using System;
+using System.Collections.Generic;
 
 namespace PandarosWoWLogParser
 {
@@ -63,6 +64,36 @@ namespace PandarosWoWLogParser
         public static long ToJavaScriptMilliseconds(this DateTime dt)
         {
             return (long)((dt.Ticks - DatetimeMinTimeTicks) / 10000);
+        }
+
+        public static void AddValue(this Dictionary<string, long> dic, string key, long value)
+        {
+            if (dic.TryGetValue(key, out long existingVal))
+            {
+                dic[key] = existingVal + value;
+            }
+            else
+            {
+                dic[key] = value;
+            }
+        }
+
+        public static void AddValue(this Dictionary<string, Dictionary<string, long>> dic, string key, string key2, long value)
+        {
+            if (!dic.TryGetValue(key, out Dictionary<string, long> dic2))
+            {
+                dic2 = new Dictionary<string, long>();
+                dic.Add(key, dic2);
+            }
+
+            if (dic2.TryGetValue(key2, out long existingVal))
+            {
+                dic2[key2] = existingVal + value;
+            }
+            else
+            {
+                dic2[key2] = value;
+            }
         }
     }
 }

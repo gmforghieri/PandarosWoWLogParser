@@ -23,17 +23,17 @@ namespace PandarosWoWLogParser
 
                 if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceName != "nil")
                 {
-                    if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceGuid, out var list))
+                    if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var list))
                     {
                         list = new List<string>();
-                        OwnerToEntityMap[combatEvent.SourceGuid] = list;
+                        OwnerToEntityMap[combatEvent.SourceName] = list;
                     }
 
                     if (!list.Contains(combatEvent.DestGuid))
                         list.Add(combatEvent.DestGuid);
 
                     if (!EntitytoOwnerMap.ContainsKey(combatEvent.DestGuid))
-                        EntitytoOwnerMap.Add(combatEvent.DestGuid, combatEvent.SourceGuid);
+                        EntitytoOwnerMap.Add(combatEvent.DestGuid, combatEvent.SourceName);
                 }
             }
             else
@@ -43,7 +43,7 @@ namespace PandarosWoWLogParser
                     if (EntitytoOwnerMap.TryGetValue(combatEvent.DestGuid, out var ownerId))
                         EntitytoOwnerMap.Remove(combatEvent.DestGuid);
 
-                    if (!string.IsNullOrEmpty(ownerId) && OwnerToEntityMap.TryGetValue(ownerId, out var entities))
+                    if (OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var entities))
                         entities.Remove(combatEvent.DestGuid);
 
                     EntitytoOwnerMap.Remove(combatEvent.DestGuid);

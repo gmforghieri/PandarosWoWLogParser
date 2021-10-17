@@ -7,94 +7,49 @@ using System.Linq;
 
 namespace PandarosWoWLogParser.Calculators
 {
-    public class TotalDamageDoneCalculator : ICalculator
+    public class TotalDamageDoneCalculator : BaseCalculator
     {
         Dictionary<string, long> _damageDoneByPlayersTotal = new Dictionary<string, long>();
         Dictionary<string, long> _damageDoneByPlayersFight = new Dictionary<string, long>();
-        IPandaLogger _logger;
 
-        public TotalDamageDoneCalculator(IPandaLogger logger)
+        public TotalDamageDoneCalculator(IPandaLogger logger, IStatsReporting reporter) : base(logger, reporter)
         {
-            _logger = logger;
+            ApplicableEvents = new List<string>()
+            {
+                LogEvents.SPELL_DAMAGE,
+                LogEvents.RANGE_DAMAGE,
+                LogEvents.SWING_DAMAGE,
+                LogEvents.SPELL_PERIODIC_DAMAGE
+            };
         }
 
-        public List<string> ApplicableEvents { get; set; } = new List<string>()
-        {
-            LogEvents.SPELL_DAMAGE,
-            LogEvents.RANGE_DAMAGE,
-            LogEvents.SWING_DAMAGE,
-            LogEvents.SPELL_PERIODIC_DAMAGE
-        };
-
-        public void CalculateEvent(ICombatEvent combatEvent, CombatState state)
+        public override void CalculateEvent(ICombatEvent combatEvent, CombatState state)
         {
             var damage = (IDamage)combatEvent;
 
             if (combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player)
             {
-                if (_damageDoneByPlayersTotal.TryGetValue(combatEvent.SourceName, out long dmgTotal))
-                {
-                    _damageDoneByPlayersTotal[combatEvent.SourceName] = dmgTotal + damage.Damage;
-                }
-                else
-                {
-                    _damageDoneByPlayersTotal[combatEvent.SourceName] = damage.Damage;
-                }
+                _damageDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Damage);
             }
 
             if (state.InFight && combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player)
             {
-                if (_damageDoneByPlayersFight.TryGetValue(combatEvent.SourceName, out long dmgTotal))
-                {
-                    _damageDoneByPlayersFight[combatEvent.SourceName] = dmgTotal + damage.Damage;
-                }
-                else
-                {
-                    _damageDoneByPlayersFight[combatEvent.SourceName] = damage.Damage;
-                }
+                _damageDoneByPlayersFight.AddValue(combatEvent.SourceName, damage.Damage);
             }
         }
 
-        public void FinalizeCalculations(CombatState state)
+        public override void FinalizeCalculations(CombatState state)
         {
-            int i = 0;
-            _logger.Log("---------------------------------------------");
-            _logger.Log("Damage Rankings");
-            _logger.Log("---------------------------------------------");
-            foreach (var person in _damageDoneByPlayersTotal.OrderBy(i => i.Value).Reverse())
-            {
-                i++;
-                _logger.Log($"{i}. {person.Key}: {person.Value.ToString("N")}");
-            }
-            _logger.Log("---------------------------------------------");
+            _statsReporting.Report(_damageDoneByPlayersTotal, "Damage Rankings", state);
         }
 
-        public void FinalizeFight(MonitoredFight fight, CombatState state)
+        public override void FinalizeFight(MonitoredFight fight, CombatState state)
         {
-            int i = 0;
-            var ts = fight.FightEnd.Subtract(fight.FightStart);
-            _logger.Log("---------------------------------------------");
-            _logger.Log($"Damage Rankings: {fight.CurrentZone.ZoneName} - {fight.BossName}");
-            _logger.Log("---------------------------------------------");
-            foreach (var person in _damageDoneByPlayersFight.OrderBy(i => i.Value).Reverse())
-            {
-                i++;
-                _logger.Log($"{i}. {person.Key}: {person.Value.ToString("N")}");
-            }
-            _logger.Log("---------------------------------------------");
-
-            _logger.Log("---------------------------------------------");
-            _logger.Log($"DPS Rankings: {fight.CurrentZone.ZoneName} - {fight.BossName}");
-            _logger.Log("---------------------------------------------");
-            foreach (var person in _damageDoneByPlayersFight.OrderBy(i => i.Value).Reverse())
-            {
-                i++;
-                _logger.Log($"{i}. {person.Key}: {(person.Value / ts.TotalSeconds).ToString("N")}");
-            }
-            _logger.Log("---------------------------------------------");
+            _statsReporting.Report(_damageDoneByPlayersFight, "Damage Rankings", fight, state);
+            _statsReporting.ReportPerSecondNumbers(_damageDoneByPlayersFight, "DPS Rankings", fight, state);
         }
 
-        public void StartFight(MonitoredFight fight, CombatState state)
+        public override void StartFight(MonitoredFight fight, CombatState state)
         {
             _damageDoneByPlayersFight.Clear();
         }

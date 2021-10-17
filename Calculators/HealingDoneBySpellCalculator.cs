@@ -10,8 +10,9 @@ namespace PandarosWoWLogParser.Calculators
     public class HealingDoneBySpellCalculator : ICalculator
     {
         Dictionary<string, long> _healingDoneBySpellTotal = new Dictionary<string, long>();
-
+        Dictionary<string, Dictionary<string, long>> _healingSpellByPlayer = new Dictionary<string, Dictionary<string, long>>();
         Dictionary<string, long> _healingDoneBySpellsFight = new Dictionary<string, long>();
+        Dictionary<string, Dictionary<string, long>> _healingSpellByPlayerFight = new Dictionary<string, Dictionary<string, long>>();
 
         public List<string> ApplicableEvents { get; set; } = new List<string>()
         {
@@ -33,25 +34,13 @@ namespace PandarosWoWLogParser.Calculators
 
             if (combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player && combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player)
             {
-                if (_healingDoneBySpellTotal.TryGetValue(spell.SpellName, out long overHeal))
-                {
-                    _healingDoneBySpellTotal[spell.SpellName] = overHeal + damage.Overhealing;
-                }
-                else
-                {
-                    _healingDoneBySpellTotal[spell.SpellName] = damage.Overhealing;
-                }
+                _healingDoneBySpellTotal.AddValue(spell.SpellName, damage.Overhealing);
+                _healingSpellByPlayer.AddValue(combatEvent.SourceName, spell.SpellName, damage.Overhealing);
 
                 if (state.InFight)
                 {
-                    if (_healingDoneBySpellsFight.TryGetValue(spell.SpellName, out long overFight))
-                    {
-                        _healingDoneBySpellsFight[spell.SpellName] = overFight + damage.Overhealing;
-                    }
-                    else
-                    {
-                        _healingDoneBySpellsFight[spell.SpellName] = damage.Overhealing;
-                    }
+                    _healingDoneBySpellsFight.AddValue(spell.SpellName, damage.Overhealing);
+                    _healingSpellByPlayerFight.AddValue(combatEvent.SourceName, spell.SpellName, damage.Overhealing);
                 }
             }
         }
@@ -98,6 +87,8 @@ namespace PandarosWoWLogParser.Calculators
         public void StartFight(MonitoredFight fight, CombatState state)
         {
             _healingDoneBySpellsFight.Clear();
+            _healingSpellByPlayerFight.Clear();
+
         }
     }
 }

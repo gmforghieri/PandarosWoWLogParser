@@ -291,6 +291,10 @@ namespace PandarosWoWLogParser
         {
             int i = 0;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
+
+            if (ts.TotalSeconds <= 0)
+                return;
+
             Log("---------------------------------------------");
             Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
             Log("---------------------------------------------");

@@ -24,7 +24,7 @@ namespace PandarosWoWLogParser.Calculators
 
         public override void CalculateEvent(ICombatEvent combatEvent)
         {
-            if (combatEvent.SourceFlags.GetFlagType() != UnitFlags.FlagType.Player)
+            if (combatEvent.SourceFlags.GetFlagType != UnitFlags.FlagType.Player)
                 return;
 
             var damage = (IDamage)combatEvent;

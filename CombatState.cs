@@ -17,37 +17,39 @@ namespace PandarosWoWLogParser
 
         public void ProcessCombatEvent(ICombatEvent combatEvent)
         {
-            if (!EntityIdToNameMap.ContainsKey(combatEvent.DestGuid))
+            if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceName != "nil")
+            {
+                if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var list))
+                {
+                    list = new List<string>();
+                    OwnerToEntityMap[combatEvent.SourceName] = list;
+                }
+
+                if (!list.Contains(combatEvent.DestGuid))
+                    list.Add(combatEvent.DestGuid);
+
+                if (!EntitytoOwnerMap.ContainsKey(combatEvent.DestGuid))
+                    EntitytoOwnerMap.Add(combatEvent.DestGuid, combatEvent.SourceName);
+            }
+
+            if (combatEvent.EventName == LogEvents.UNIT_DIED)
+            {
+                if (EntitytoOwnerMap.TryGetValue(combatEvent.DestGuid, out var ownerId))
+                    EntitytoOwnerMap.Remove(combatEvent.DestGuid);
+
+                if (OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var entities))
+                    entities.Remove(combatEvent.DestGuid);
+
+                EntitytoOwnerMap.Remove(combatEvent.DestGuid);
+                EntityIdToNameMap.Remove(combatEvent.DestGuid);
+            }
+
+
+            if (combatEvent.DestName != "nil" &&
+                combatEvent.DestFlags.GetFlagType != UnitFlags.FlagType.Player &&
+                !EntityIdToNameMap.ContainsKey(combatEvent.DestGuid))
             {
                 EntityIdToNameMap.Add(combatEvent.DestGuid, combatEvent.DestName);
-
-                if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceName != "nil")
-                {
-                    if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var list))
-                    {
-                        list = new List<string>();
-                        OwnerToEntityMap[combatEvent.SourceName] = list;
-                    }
-
-                    if (!list.Contains(combatEvent.DestGuid))
-                        list.Add(combatEvent.DestGuid);
-
-                    if (!EntitytoOwnerMap.ContainsKey(combatEvent.DestGuid))
-                        EntitytoOwnerMap.Add(combatEvent.DestGuid, combatEvent.SourceName);
-                }
-            }
-            else
-            {
-                if (combatEvent.EventName == LogEvents.UNIT_DIED)
-                {
-                    if (EntitytoOwnerMap.TryGetValue(combatEvent.DestGuid, out var ownerId))
-                        EntitytoOwnerMap.Remove(combatEvent.DestGuid);
-
-                    if (OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var entities))
-                        entities.Remove(combatEvent.DestGuid);
-
-                    EntitytoOwnerMap.Remove(combatEvent.DestGuid);
-                }
             }
         }
 

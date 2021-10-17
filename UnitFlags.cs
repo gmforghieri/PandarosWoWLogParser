@@ -58,28 +58,18 @@ namespace PandarosWoWLogParser
 
         public UnitFlags(int value)
         {
-            this.Value = value;
+            Value = value;
+            GetController = (Controller)(Value & (int)Controller.Mask);
+            GetFlagType = (FlagType)(Value & (int)FlagType.Mask);
+            GetReaction = (Reaction)(Value & (int)Reaction.Mask);
+            GetControllerAffiliation = (ControllerAffiliation)(Value & (int)ControllerAffiliation.Mask);
+            GetSpecial = (Special)(Value & (int)Special.Mask);
         }
 
-        public Controller GetController()
-        {
-            return (Controller)(Value & (int)Controller.Mask);
-        }
-        public FlagType GetFlagType()
-        {
-            return (FlagType)(Value & (int)FlagType.Mask);
-        }
-        public Reaction GetReaction()
-        {
-            return (Reaction)(Value & (int)Reaction.Mask);
-        }
-        public ControllerAffiliation GetControllerAffiliation()
-        {
-            return (ControllerAffiliation)(Value & (int)ControllerAffiliation.Mask);
-        }
-        public Special GetSpecial()
-        {
-            return (Special)(Value & (int)Special.Mask);
-        }
+        public Controller GetController { get; set; }
+        public FlagType GetFlagType { get; set; }
+        public Reaction GetReaction { get; set; }
+        public ControllerAffiliation GetControllerAffiliation { get; set; }
+        public Special GetSpecial { get; set; }
     }
 }

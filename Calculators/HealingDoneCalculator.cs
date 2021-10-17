@@ -25,7 +25,7 @@ namespace PandarosWoWLogParser.Calculators
         {
             var damage = (ISpellHeal)combatEvent;
 
-            if (combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player && combatEvent.SourceFlags.GetFlagType() == UnitFlags.FlagType.Player)
+            if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Player)
             {
                 _healingDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.HealAmount);
                 _overHealingDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Overhealing);

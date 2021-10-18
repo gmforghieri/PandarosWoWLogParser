@@ -41,6 +41,7 @@ namespace PandarosWoWLogParser.Calculators
         {
             _statsReporting.Report(_healingDoneBySpellTotal, "Healing By Spell Raid wide", Fight, State);
             _statsReporting.ReportPerSecondNumbers(_healingDoneBySpellTotal, "HPS By Spell Raid wide", Fight, State);
+            _statsReporting.Report(_healingSpellByPlayer, "Healing Spell by Player", Fight, State);
         }
 
         public override void StartFight()

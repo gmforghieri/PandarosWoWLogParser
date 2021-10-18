@@ -9,5 +9,6 @@ namespace PandarosWoWLogParser
     {
         public void ReportPerSecondNumbers(Dictionary<string, long> stats, string name, MonitoredFight fight, CombatState state);
         public void Report(Dictionary<string, long> stats, string name, MonitoredFight fight, CombatState state);
+        public void Report(Dictionary<string, Dictionary<string, long>> stats, string name, MonitoredFight fight, CombatState state);
     }
 }

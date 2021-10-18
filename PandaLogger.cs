@@ -320,6 +320,37 @@ namespace PandarosWoWLogParser
                 Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({Math.Round(kvp.Value / (double)total, 2) * 100 }%)");
             }
         }
+
+        public void Report(Dictionary<string, Dictionary<string, long>> stats, string name, MonitoredFight fight, CombatState state)
+        {
+            var ts = fight.FightEnd.Subtract(fight.FightStart);
+            long total = 0;
+            Dictionary<string, long> totals = new Dictionary<string, long>();
+            int i = 0;
+
+            foreach (var baseKvp in stats)
+            {
+                var subTotal = baseKvp.Value.Sum(kvp => kvp.Value);
+                total += subTotal;
+                totals[baseKvp.Key] = subTotal;
+            }
+
+            Log("---------------------------------------------");
+            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log("---------------------------------------------");
+            foreach (var baseKvp in totals.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                var j = 0;
+                Log($"{i}. {baseKvp.Key}: {baseKvp.Value.ToString("N")} ({Math.Round(baseKvp.Value / (double)total, 2) * 100 }%)");
+
+                foreach (var kvp in stats[baseKvp.Key].OrderBy(i => i.Value).Reverse())
+                {
+                    j++;
+                    Log($"      {j}. {kvp.Key}: {kvp.Value.ToString("N")} ({Math.Round(kvp.Value / (double)baseKvp.Value, 2) * 100 }%)");
+                }
+            }
+        }
     }
 }
 

@@ -20,7 +20,7 @@ namespace PandarosWoWLogParser.Parsers
             obj.SourceGuid = eventData[Indexes.UnitKeys.SourceGUID];
             obj.SourceName = eventData[Indexes.UnitKeys.SourceName];
             obj.SourceFlags = eventData[Indexes.UnitKeys.SourceFlags].ToUnitFlags();
-            obj.DestGuid = eventData[Indexes.UnitKeys.SourceGUID];
+            obj.DestGuid = eventData[Indexes.UnitKeys.DestGUID];
             obj.DestName = eventData[Indexes.UnitKeys.DestName];
             obj.DestFlags = eventData[Indexes.UnitKeys.DestFlags].ToUnitFlags();
             return obj;

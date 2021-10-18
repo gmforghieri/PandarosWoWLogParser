@@ -57,7 +57,7 @@ namespace PandarosWoWLogParser.Calculators
             if (Calculators.TryGetValue(combatEvent.EventName, out var calcList))
                 foreach (var calc in calcList)
                     calc.CalculateEvent(combatEvent);
-        }
+           }
 
 
         public void StartFight()

@@ -17,7 +17,13 @@ namespace PandarosWoWLogParser
 
         public void ProcessCombatEvent(ICombatEvent combatEvent)
         {
-            if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceName != "nil")
+            if (combatEvent.DestName != "nil" &&
+                combatEvent.DestFlags.GetFlagType != UnitFlags.FlagType.Player)
+            {
+                EntityIdToNameMap[combatEvent.DestGuid] = combatEvent.DestName;
+            }
+
+            if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Player)
             {
                 if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var list))
                 {
@@ -42,14 +48,6 @@ namespace PandarosWoWLogParser
 
                 EntitytoOwnerMap.Remove(combatEvent.DestGuid);
                 EntityIdToNameMap.Remove(combatEvent.DestGuid);
-            }
-
-
-            if (combatEvent.DestName != "nil" &&
-                combatEvent.DestFlags.GetFlagType != UnitFlags.FlagType.Player &&
-                !EntityIdToNameMap.ContainsKey(combatEvent.DestGuid))
-            {
-                EntityIdToNameMap.Add(combatEvent.DestGuid, combatEvent.DestName);
             }
         }
 

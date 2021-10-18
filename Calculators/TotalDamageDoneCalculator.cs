@@ -30,6 +30,11 @@ namespace PandarosWoWLogParser.Calculators
             var damage = (IDamage)combatEvent;
 
             _damageDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Damage);
+
+            if (State.TryGetOwnerName(combatEvent, out var owner))
+            {
+                _damageDoneByPlayersTotal.AddValue(owner, damage.Damage);
+            }
         }
 
         public override void FinalizeFight()

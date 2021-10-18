@@ -60,5 +60,12 @@ namespace PandarosWoWLogParser
             else
                 return "Unknown";
         }
+
+        public bool TryGetOwnerName(ICombatEvent combatEvent, out string owner)
+        {
+            owner = null;
+            return combatEvent.SourceFlags.GetController == UnitFlags.Controller.Player &&
+                EntitytoOwnerMap.TryGetValue(combatEvent.SourceGuid, out owner);
+        }
     }
 }

@@ -28,8 +28,12 @@ namespace PandarosWoWLogParser.Calculators
 
             if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Player)
             {
-                _healingDoneBySpellTotal.AddValue(spell.SpellName, damage.Overhealing);
-                _healingSpellByPlayer.AddValue(combatEvent.SourceName, spell.SpellName, damage.Overhealing);
+                _healingDoneBySpellTotal.AddValue(spell.SpellName, damage.HealAmount);
+                _healingSpellByPlayer.AddValue(combatEvent.SourceName, spell.SpellName, damage.HealAmount);
+            } else if (State.TryGetOwnerName(combatEvent, out var owner))
+            {
+                _healingDoneBySpellTotal.AddValue(spell.SpellName, damage.HealAmount);
+                _healingSpellByPlayer.AddValue(owner, spell.SpellName, damage.HealAmount);
             }
         }
 

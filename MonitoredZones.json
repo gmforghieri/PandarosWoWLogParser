@@ -1,0 +1,35 @@
+[
+  {
+    "ZoneName": "Serpentshrine Cavern",
+    "MonitoredFights": {
+      "Lady Vashj": [ "Lady Vashj", "Tainted Elementals", "Toxic Sporebat", "Coilfang Strider", "Coilfang Elite", "Enchanted Elemental" ],
+      "Hydross the Unstable": [ "Hydross the Unstable" ],
+      "The Lurker Below": [ "The Lurker Below" ],
+      "Leotheras the Blind": [ "Leotheras the Blind" ],
+      "Fathom-Lord Karathress": [ "Fathom-Guard Sharkkis", "Fathom-Guard Tidalvess", "Fathom-Guard Caribdis" ],
+      "Morogrim Tidewalker": [ "Morogrim Tidewalker" ]
+    }
+  },
+  {
+    "ZoneName": "Karazhan",
+    "MonitoredFights": {
+      "Attumen the Huntsman": [ "Attumen the Huntsman" ],
+      "Moroes": [ "Moroes", "Lady Catriona Von'Indi", "Lady Keira Berrybuck", "Baroness Dorothea Millstipe", "Baron Rafe Dreuger", "Lord Robin Daris, Moroes", "Lord Crispin Ference" ],
+      "Maiden of Virtue": [ "Maiden of Virtue" ],
+      "Opera House": [ "Dorothee", "Tito", "Tinhead", "Strawman", "Roar", "Crone", "Big Bad Wolf", "Romulo", "Julianne" ],
+      "The Curator": [ "The Curator" ],
+      "Terestian Illhoof": [ "Terestian Illhoof", "Kil'rek" ],
+      "Shade of Aran": [ "Shade of Aran" ],
+      "Netherspite": [ "Netherspite" ],
+      "Prince Malchezaar": [ "Prince Malchezaar" ],
+      "Nightbane": [ "Nightbane" ],
+      "Rokad the Ravager": [ "Rokad the Ravager" ],
+      "Shadikith the Glider": [ "Shadikith the Glider" ],
+      "Hyakiss the Lurker": [ "Hyakiss the Lurker" ]
+    }
+  },
+  {
+    "ZoneName": "Shattered Halls",
+    "MonitoredFights": { "Warchief Kargath Bladefist": [ "Warchief Kargath Bladefist" ] }
+  }
+]

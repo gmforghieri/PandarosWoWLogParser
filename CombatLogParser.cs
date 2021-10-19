@@ -62,7 +62,7 @@ namespace PandarosWoWLogParser
 
             ICalculatorFactory _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, allFights);
 
-            using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (StreamReader sr = new StreamReader(fs))
                 {

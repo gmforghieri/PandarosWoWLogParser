@@ -8,6 +8,7 @@ using PandarosWoWLogParser.Parsers;
 using System.Collections.Generic;
 using PandarosWoWLogParser.Calculators;
 using PandarosWoWLogParser.FightMonitor;
+using System.Configuration;
 
 namespace PandarosWoWLogParser
 {
@@ -18,7 +19,7 @@ namespace PandarosWoWLogParser
         static void Main(string[] args)
         {
             var builder = new ContainerBuilder();
-            var logger = new PandaLogger("C:/temp/");
+            var logger = new PandaLogger(ConfigurationManager.AppSettings.Get("outputDir"));
             builder.RegisterInstance(logger).As<IPandaLogger>().SingleInstance();
             builder.RegisterInstance(logger).As<IStatsReporter>().SingleInstance();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
@@ -40,7 +41,7 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellDrainParser>().As<ICombatParser<SpellDrain>>().SingleInstance();
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
-
+            
             List<MonitoredZone> monitoredZones = new List<MonitoredZone>()
             {
                 new MonitoredZone()
@@ -97,7 +98,7 @@ namespace PandarosWoWLogParser
             logger.Log("Starting Parse.");
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var count = clp.ParseToEnd(@"C:\Program Files\Ascension Launcher\resources\client\Logs\WoWCombatLog.log");
+            var count = clp.ParseToEnd(ConfigurationManager.AppSettings.Get("logfile"));
             sw.Stop();
             logger.Log($"Parsed {count} events in {sw.Elapsed}.");
             Thread.Sleep(1000);

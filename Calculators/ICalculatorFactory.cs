@@ -12,9 +12,7 @@ namespace PandarosWoWLogParser.Calculators
         public CombatState State { get; set; }
         public MonitoredFight Fight { get; set; }
         public void CalculateEvent(ICombatEvent combatEvent);
-
         public void StartFight();
-
         public void FinalizeFight();
     }
 }

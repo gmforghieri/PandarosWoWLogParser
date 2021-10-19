@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using PandarosWoWLogParser.Calculators;
 using PandarosWoWLogParser.FightMonitor;
 using System.Configuration;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace PandarosWoWLogParser
 {
@@ -41,52 +43,8 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellDrainParser>().As<ICombatParser<SpellDrain>>().SingleInstance();
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
-            
-            List<MonitoredZone> monitoredZones = new List<MonitoredZone>()
-            {
-                new MonitoredZone()
-                {
-                    ZoneName = "Serpentshrine Cavern",
-                    MonitoredFights = new Dictionary<string, List<string>>()
-                    {
-                        { "Lady Vashj", new List<string>() { "Lady Vashj", "Tainted Elementals", "Toxic Sporebat", "Coilfang Strider", "Coilfang Elite", "Enchanted Elemental" } },
-                        { "Hydross the Unstable", new List<string>() { "Hydross the Unstable" } },
-                        { "The Lurker Below", new List<string>() { "The Lurker Below" } },
-                        { "Leotheras the Blind", new List<string>() { "Leotheras the Blind" } },
-                        { "Fathom-Lord Karathress", new List<string>() { "Fathom-Guard Sharkkis", "Fathom-Guard Tidalvess", "Fathom-Guard Caribdis" } },
-                        { "Morogrim Tidewalker", new List<string>() { "Morogrim Tidewalker" } }
-                    }
-                },
-                new MonitoredZone()
-                {
-                    ZoneName = "Karazhan",
-                    MonitoredFights = new Dictionary<string, List<string>>()
-                    {
-                        { "Attumen the Huntsman", new List<string>() { "Attumen the Huntsman" } },
-                        { "Moroes", new List<string>() { "Moroes", "Lady Catriona Von'Indi", "Lady Keira Berrybuck", "Baroness Dorothea Millstipe", "Baron Rafe Dreuger", "Lord Robin Daris, Moroes", "Lord Crispin Ference" } },
-                        { "Maiden of Virtue", new List<string>() { "Maiden of Virtue" } },
-                        { "Opera House", new List<string>() { "Dorothee", "Tito", "Tinhead", "Strawman", "Roar", "Crone", "Big Bad Wolf", "Romulo", "Julianne" } },
-                        { "The Curator", new List<string>() { "The Curator" } },
-                        { "Terestian Illhoof", new List<string>() { "Terestian Illhoof", "Kil'rek" } },
-                        { "Shade of Aran", new List<string>() { "Shade of Aran" } },
-                        { "Netherspite", new List<string>() { "Netherspite" } },
-                        { "Prince Malchezaar", new List<string>() { "Prince Malchezaar" } },
-                        { "Nightbane", new List<string>() { "Nightbane" } },
-                        { "Rokad the Ravager", new List<string>() { "Rokad the Ravager" } },
-                        { "Shadikith the Glider", new List<string>() { "Shadikith the Glider" } },
-                        { "Hyakiss the Lurker", new List<string>() { "Hyakiss the Lurker" } }
-                    }
-                },
-                new MonitoredZone()
-                {
-                    ZoneName = "Shattered Halls",
-                    MonitoredFights = new Dictionary<string, List<string>>()
-                    {
-                        { "Warchief Kargath Bladefist", new List<string>() { "Warchief Kargath Bladefist" } }
-                    }
-                }
-            };
 
+            var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
             builder.RegisterInstance(monitoredZones);
             builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>().SingleInstance();
             builder.RegisterType<CombatLogParser>();

@@ -15,7 +15,7 @@ namespace PandarosWoWLogParser.Parsers
         public SpellMissed Parse(DateTime timestamp, string eventName, string[] eventData, SpellMissed obj)
         {
             obj = (SpellMissed)base.Parse(timestamp, eventName, eventData, obj);
-            obj.MissType = eventData[Indexes.SPELL_MISSED.MissedType];
+            obj.MissType = (MissType)Enum.Parse(typeof(MissType), eventData[Indexes.SPELL_MISSED.MissedType], true);
             return obj;
         }
     }

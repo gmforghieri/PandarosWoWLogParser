@@ -4,9 +4,8 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellMissed : SpellBase, ISpellMissed
+    public class SpellMissed : SpellBase, IMissed
     {
-        public string MissType { get; set; }
-        public int MissDamage { get; set; }
+        public MissType MissType { get; set; }
     }
 }

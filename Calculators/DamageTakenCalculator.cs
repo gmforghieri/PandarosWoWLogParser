@@ -26,15 +26,15 @@ namespace PandarosWoWLogParser.Calculators
         {
             var damage = (IDamage)combatEvent;
 
-            if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Npc)
+            if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Npc && combatEvent.DestFlags.GetFlagType == UnitFlags.FlagType.Player)
             {
-
+                _damageTakenByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, damage.Damage);
             }
         }
 
         public override void FinalizeFight()
         {
-            
+            _statsReporting.Report(_damageTakenByEntityFromEntity, "Damage Taken", Fight, State);
         }
 
         public override void StartFight()

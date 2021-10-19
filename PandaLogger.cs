@@ -317,7 +317,7 @@ namespace PandarosWoWLogParser
             foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
             {
                 i++;
-                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({Math.Round(kvp.Value / (double)total, 2) * 100 }%)");
+                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3) }%)");
             }
         }
 
@@ -342,13 +342,38 @@ namespace PandarosWoWLogParser
             {
                 i++;
                 var j = 0;
-                Log($"{i}. {baseKvp.Key}: {baseKvp.Value.ToString("N")} ({Math.Round(baseKvp.Value / (double)total, 2) * 100 }%)");
+                Log($"{i}. {baseKvp.Key}: {baseKvp.Value.ToString("N")} ({(Math.Round(baseKvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3) }%)");
 
                 foreach (var kvp in stats[baseKvp.Key].OrderBy(i => i.Value).Reverse())
                 {
                     j++;
-                    Log($"      {j}. {kvp.Key}: {kvp.Value.ToString("N")} ({Math.Round(kvp.Value / (double)baseKvp.Value, 2) * 100 }%)");
+                    Log($"      {j}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)baseKvp.Value, 2) * 100).ToString().PadRight(3).Substring(0, 3) }%)");
                 }
+            }
+        }
+
+        public void ReportTable(List<List<string>> table, string name, MonitoredFight fight, CombatState state)
+        {
+            Log("---------------------------------------------");
+            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log("---------------------------------------------");
+            foreach(var line in table)
+            {
+                StringBuilder sb = new StringBuilder();
+                bool cellOne = true;
+                foreach (var cell in line)
+                {
+                    sb.Append("|");
+                    if (cellOne)
+                    {
+                        cellOne = false;
+                        sb.Append(cell.PadRight(20));
+                    }
+                    else
+                        sb.Append(cell.PadRight(10));
+                }
+                sb.Append("|");
+                Log(sb.ToString());
             }
         }
     }

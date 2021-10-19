@@ -66,7 +66,7 @@ namespace PandarosWoWLogParser
             return (long)((dt.Ticks - DatetimeMinTimeTicks) / 10000);
         }
 
-        public static void AddValue(this Dictionary<string, long> dic, string key, long value)
+        public static void AddValue<T>(this Dictionary<T, long> dic, T key, long value)
         {
             if (dic.TryGetValue(key, out long existingVal))
             {
@@ -78,7 +78,7 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public static void AddValue(this Dictionary<string, int> dic, string key, int value)
+        public static void AddValue<T>(this Dictionary<T, int> dic, T key, int value)
         {
             if (dic.TryGetValue(key, out int existingVal))
             {
@@ -90,11 +90,11 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public static void AddValue(this Dictionary<string, Dictionary<string, long>> dic, string key, string key2, long value)
+        public static void AddValue<T, G>(this Dictionary<T, Dictionary<G, long>> dic, T key, G key2, long value)
         {
-            if (!dic.TryGetValue(key, out Dictionary<string, long> dic2))
+            if (!dic.TryGetValue(key, out Dictionary<G, long> dic2))
             {
-                dic2 = new Dictionary<string, long>();
+                dic2 = new Dictionary<G, long>();
                 dic.Add(key, dic2);
             }
 

@@ -105,7 +105,12 @@ namespace PandarosWoWLogParser.Calculators
                 table.Add(row);
             }
 
-            _statsReporting.ReportTable(table, "Missed Attacks", Fight, State);
+            var length = new List<int>()
+            {
+                35
+            };
+
+            _statsReporting.ReportTable(table, "Missed Attacks", Fight, State, length);
             _statsReporting.Report(_missedAttacks, "Missed Attack Breakdown", Fight, State);
         }
 

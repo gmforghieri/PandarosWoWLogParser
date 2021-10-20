@@ -95,7 +95,12 @@ namespace PandarosWoWLogParser.Calculators
                 table.Add(row);
             }
 
-            _statsReporting.ReportTable(table, "Avoidance", Fight, State);
+            var length = new List<int>()
+            {
+                35
+            };
+
+            _statsReporting.ReportTable(table, "Avoidance", Fight, State, length);
 
             _statsReporting.Report(_attackAvoidedByEntityFromEntity, "Avoidance by Monster by Miss Type (% of all avoidance during fight)", Fight, State);
         }

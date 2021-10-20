@@ -108,6 +108,27 @@ namespace PandarosWoWLogParser
             }
         }
 
+        public static void AddValue<T, G>(this Dictionary<T, Dictionary<G, List<long>>> dic, T key, G key2, int index, long value)
+        {
+            if (!dic.TryGetValue(key, out Dictionary<G, List<long>> dic2))
+            {
+                dic2 = new Dictionary<G, List<long>>();
+                dic.Add(key, dic2);
+            }
+
+            if (dic2.TryGetValue(key2, out List<long> existingVal))
+            {
+                if (existingVal.Count > index)
+                    dic2[key2][index] = existingVal[index] + value;
+                else
+                    existingVal.Add(value);
+            }
+            else
+            {
+                dic2[key2] = new List<long>() { value };
+            }
+        }
+
         public static void AddValue<T, G, B>(this Dictionary<T, Dictionary<G, Dictionary<B, long>>> dic, T key, G key2, B key3, long value)
         {
             if (!dic.TryGetValue(key, out Dictionary<G, Dictionary<B, long>> dic2))

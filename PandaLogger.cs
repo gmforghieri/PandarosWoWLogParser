@@ -399,7 +399,7 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public void ReportTable(List<List<string>> table, string name, MonitoredFight fight, CombatState state)
+        public void ReportTable(List<List<string>> table, string name, MonitoredFight fight, CombatState state, List<int> length = default(List<int>))
         {
             Log("---------------------------------------------");
             Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
@@ -407,17 +407,17 @@ namespace PandarosWoWLogParser
             foreach(var line in table)
             {
                 StringBuilder sb = new StringBuilder();
-                bool cellOne = true;
+                int i = 0;
                 foreach (var cell in line)
                 {
                     sb.Append("|");
-                    if (cellOne)
-                    {
-                        cellOne = false;
-                        sb.Append(cell.PadRight(20));
-                    }
-                    else
-                        sb.Append(cell.PadRight(10));
+                    var pad = 10;
+
+                    if (length != default(List<int>) && length.Count > i)
+                        pad = length[i];
+
+                    i++;
+                    sb.Append(cell.PadRight(pad));
                 }
                 sb.Append("|");
                 Log(sb.ToString());

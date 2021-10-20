@@ -1,8 +1,7 @@
 ﻿namespace PandarosWoWLogParser.Models
 {
-    public interface ISpellAuraBrokenSpell
+    public interface ISpellAuraBrokenSpell : ISpellAura
     {
-        string AuraType { get; set; }
         int ExtraSpellID { get; set; }
         string ExtraSpellName { get; set; }
         SpellSchool ExtraSpellSchool { get; set; }

@@ -17,7 +17,8 @@ namespace PandarosWoWLogParser.Calculators
                     LogEvents.SPELL_DAMAGE,
                     LogEvents.RANGE_DAMAGE,
                     LogEvents.SWING_DAMAGE,
-                    LogEvents.SPELL_PERIODIC_DAMAGE
+                    LogEvents.SPELL_PERIODIC_DAMAGE,
+                    LogEvents.DAMAGE_SHIELD
                 };
         }
 

@@ -1,4 +1,5 @@
-﻿using PandarosWoWLogParser.Models;
+﻿using CombatLogParser;
+using PandarosWoWLogParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,8 @@ namespace PandarosWoWLogParser
 
         public Dictionary<string, string> EntitytoOwnerMap { get; set; } = new Dictionary<string, string>();
 
-        public Dictionary<string, Dictionary<string, string>> PlayerAuras = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> PlayerBuffs { get; set; } = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> PlayerDebuffs { get; set; } = new Dictionary<string, Dictionary<string, string>>();
 
         public bool InFight { get; set; }
 
@@ -59,14 +61,21 @@ namespace PandarosWoWLogParser
                 case LogEvents.SPELL_AURA_APPLIED_DOSE:
                 case LogEvents.SPELL_AURA_REFRESH:
                     var spell = (ISpell)combatEvent;
-                    PlayerAuras.AddValue(combatEvent.DestName, spell.SpellName, combatEvent.SourceName);
+                    var aura = (ISpellAura)combatEvent;
+
+                    if (aura.AuraType == BuffType.Buff)
+                        PlayerBuffs.AddValue(combatEvent.DestName, spell.SpellName, combatEvent.SourceName);
+                    else
+                        PlayerDebuffs.AddValue(combatEvent.DestName, spell.SpellName, combatEvent.SourceName);
                     break;
 
                 case LogEvents.SPELL_AURA_BROKEN:
                 case LogEvents.SPELL_AURA_REMOVED_DOSE:
                 case LogEvents.SPELL_AURA_BROKEN_SPELL:
                     var removedSpell = (ISpell)combatEvent;
-                    PlayerAuras.RemoveValue(combatEvent.DestName, removedSpell.SpellName, combatEvent.SourceName);
+
+                    PlayerBuffs.RemoveValue(combatEvent.DestName, removedSpell.SpellName);
+                    PlayerDebuffs.RemoveValue(combatEvent.DestName, removedSpell.SpellName);
                     break;
             }
         }

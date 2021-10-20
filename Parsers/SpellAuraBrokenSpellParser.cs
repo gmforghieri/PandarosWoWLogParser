@@ -1,4 +1,5 @@
-﻿using PandarosWoWLogParser.Models;
+﻿using CombatLogParser;
+using PandarosWoWLogParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,7 +19,7 @@ namespace PandarosWoWLogParser.Parsers
             obj.ExtraSpellID = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.ExtraSpellID].ToInt();
             obj.ExtraSpellName = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.ExtraSpellName];
             obj.ExtraSpellSchool = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.ExtraSchool].ToSpellSchool();
-            obj.AuraType = eventData[Indexes.SPELL_AURA_BROKEN_SPELL.AuraType];
+            obj.AuraType = (BuffType)Enum.Parse(typeof(BuffType), eventData[Indexes.SPELL_AURA_BROKEN_SPELL.AuraType], true);
             return obj;
         }
     }

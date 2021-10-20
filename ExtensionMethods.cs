@@ -143,7 +143,7 @@ namespace PandarosWoWLogParser
             dic2[key2] = value;
         }
 
-        public static void RemoveValue<T, G>(this Dictionary<T, Dictionary<G, string>> dic, T key, G key2, string value)
+        public static void RemoveValue<T, G>(this Dictionary<T, Dictionary<G, string>> dic, T key, G key2)
         {
             if (dic.TryGetValue(key, out Dictionary<G, string> dic2))
                 dic2.Remove(key2);

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CombatLogParser;
 
 namespace PandarosWoWLogParser.Models
 {
     public class SpellAura : SpellBase, ISpellAura
     {
-        public string AuraType { get; set; }
+        public BuffType AuraType { get; set; }
     }
 }

@@ -1,7 +1,6 @@
-﻿using PandarosWoWLogParser.Models;
+﻿using CombatLogParser;
+using PandarosWoWLogParser.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PandarosWoWLogParser.Parsers
 {
@@ -15,7 +14,7 @@ namespace PandarosWoWLogParser.Parsers
         public SpellAuraDose Parse(DateTime timestamp, string eventName, string[] eventData, SpellAuraDose obj)
         {
             obj = (SpellAuraDose)base.Parse(timestamp, eventName, eventData, obj);
-            obj.AuraType = eventData[Indexes.SPELL_AURA_APPLIED_DOSE.AuraType];
+            obj.AuraType = (BuffType)Enum.Parse(typeof(BuffType), eventData[Indexes.SPELL_AURA_APPLIED_DOSE.AuraType], true);
             obj.AuraDoeseAdded = eventData[Indexes.SPELL_AURA_APPLIED_DOSE.AuraDosesAdded].ToInt();
 
             return obj;

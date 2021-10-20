@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CombatLogParser;
 
 namespace PandarosWoWLogParser.Models
 {
@@ -9,6 +7,6 @@ namespace PandarosWoWLogParser.Models
         public int ExtraSpellID { get; set; }
         public string ExtraSpellName { get; set; }
         public SpellSchool ExtraSpellSchool { get; set; }
-        public string AuraType { get; set; }
+        public BuffType AuraType { get; set; }
     }
 }

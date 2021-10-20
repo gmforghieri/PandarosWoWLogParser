@@ -1,7 +1,9 @@
-﻿namespace PandarosWoWLogParser.Models
+﻿using CombatLogParser;
+
+namespace PandarosWoWLogParser.Models
 {
     public interface ISpellAura
     {
-        string AuraType { get; set; }
+        BuffType AuraType { get; set; }
     }
 }

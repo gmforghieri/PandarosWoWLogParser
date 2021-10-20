@@ -287,7 +287,7 @@ namespace PandarosWoWLogParser
             return filenum;
         }
 
-        public void ReportPerSecondNumbers(Dictionary<string, long> stats, string name, MonitoredFight fight, CombatState state)
+        public void ReportPerSecondNumbers<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, CombatState state)
         {
             int i = 0;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
@@ -306,7 +306,7 @@ namespace PandarosWoWLogParser
             Log("---------------------------------------------");
         }
 
-        public void Report(Dictionary<string, long> stats, string name, MonitoredFight fight, CombatState state)
+        public void Report<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, CombatState state)
         {
             int i = 0;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
@@ -317,15 +317,15 @@ namespace PandarosWoWLogParser
             foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
             {
                 i++;
-                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3) }%)");
+                Log($"{i}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3).Trim() }%)");
             }
         }
 
-        public void Report(Dictionary<string, Dictionary<string, long>> stats, string name, MonitoredFight fight, CombatState state)
+        public void Report<T, G>(Dictionary<T, Dictionary<G, long>> stats, string name, MonitoredFight fight, CombatState state)
         {
             var ts = fight.FightEnd.Subtract(fight.FightStart);
             long total = 0;
-            Dictionary<string, long> totals = new Dictionary<string, long>();
+            Dictionary<T, long> totals = new Dictionary<T, long>();
             int i = 0;
 
             foreach (var baseKvp in stats)
@@ -342,12 +342,59 @@ namespace PandarosWoWLogParser
             {
                 i++;
                 var j = 0;
-                Log($"{i}. {baseKvp.Key}: {baseKvp.Value.ToString("N")} ({(Math.Round(baseKvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3) }%)");
+                Log($"{i}. {baseKvp.Key}: {baseKvp.Value.ToString("N")} ({(Math.Round(baseKvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3).Trim() }%)");
 
                 foreach (var kvp in stats[baseKvp.Key].OrderBy(i => i.Value).Reverse())
                 {
                     j++;
-                    Log($"      {j}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)baseKvp.Value, 2) * 100).ToString().PadRight(3).Substring(0, 3) }%)");
+                    Log($"      {j}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)baseKvp.Value, 2) * 100).ToString().PadRight(3).Substring(0, 3).Trim() }%)");
+                }
+            }
+        }
+
+        public void Report<T, G, B>(Dictionary<T, Dictionary<G, Dictionary<B, long>>> stats, string name, MonitoredFight fight, CombatState state)
+        {
+            var ts = fight.FightEnd.Subtract(fight.FightStart);
+            long total = 0;
+            Dictionary<T, long> totals = new Dictionary<T, long>();
+            Dictionary<T, Dictionary<G, long>> subtotals = new Dictionary<T, Dictionary<G, long>>();
+            int i = 0;
+
+            foreach (var baseKvp in stats)
+            {
+                long thisTotal = 0;
+
+                foreach (var nextKvp in baseKvp.Value)
+                {
+                    var subTotal = nextKvp.Value.Sum(kvp => kvp.Value);
+                    thisTotal += subTotal;
+                    subtotals.AddValue(baseKvp.Key, nextKvp.Key, subTotal);
+                }
+
+                total += thisTotal;
+                totals[baseKvp.Key] = thisTotal;
+            }
+
+            Log("---------------------------------------------");
+            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log("---------------------------------------------");
+            foreach (var baseKvp in totals.OrderBy(i => i.Value).Reverse())
+            {
+                i++;
+                var j = 0;
+                Log($"{i}. {baseKvp.Key}: {baseKvp.Value.ToString("N")} ({(Math.Round(baseKvp.Value / (double)total, 2) * 100).ToString().PadRight(3).Substring(0, 3).Trim() }%)");
+
+                foreach (var kvp in subtotals[baseKvp.Key].OrderBy(i => i.Value).Reverse())
+                {
+                    j++;
+                    Log($"  {j}. {kvp.Key}: {kvp.Value.ToString("N")} ({(Math.Round(kvp.Value / (double)baseKvp.Value, 2) * 100).ToString().PadRight(3).Substring(0, 3).Trim() }%)");
+
+                    var k = 0;
+                    foreach (var subkvp in stats[baseKvp.Key][kvp.Key].OrderBy(i => i.Value).Reverse())
+                    {
+                        k++;
+                        Log($"      {k}. {subkvp.Key}: {subkvp.Value.ToString("N")} ({(Math.Round(subkvp.Value / (double)kvp.Value, 2) * 100).ToString().PadRight(3).Substring(0, 3).Trim() }%)");
+                    }
                 }
             }
         }

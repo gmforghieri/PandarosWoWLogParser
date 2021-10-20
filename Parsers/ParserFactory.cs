@@ -53,6 +53,7 @@ namespace PandarosWoWLogParser.Parsers
             Parsers.Add(LogEvents.SPELL_AURA_BROKEN, spellAuraParser.Parse);
             Parsers.Add(LogEvents.SPELL_AURA_APPLIED_DOSE, spellAuraDoseParser.Parse);
             Parsers.Add(LogEvents.SPELL_AURA_REMOVED_DOSE, spellAuraDoseParser.Parse);
+            Parsers.Add(LogEvents.SPELL_AURA_BROKEN_SPELL, spellAuraBrokenSpellParser.Parse);
             Parsers.Add(LogEvents.SPELL_PERIODIC_MISSED, spellmissedParser.Parse);
             Parsers.Add(LogEvents.SPELL_MISSED, spellmissedParser.Parse);
             Parsers.Add(LogEvents.DAMAGE_SHIELD_MISSED, spellmissedParser.Parse);

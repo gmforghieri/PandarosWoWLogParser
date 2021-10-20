@@ -66,7 +66,7 @@ namespace PandarosWoWLogParser
                 case LogEvents.SPELL_AURA_REMOVED_DOSE:
                 case LogEvents.SPELL_AURA_BROKEN_SPELL:
                     var removedSpell = (ISpell)combatEvent;
-                    PlayerAuras.RemoveValue(combatEvent.DestName, spell.SpellName, combatEvent.SourceName);
+                    PlayerAuras.RemoveValue(combatEvent.DestName, removedSpell.SpellName, combatEvent.SourceName);
                     break;
             }
         }

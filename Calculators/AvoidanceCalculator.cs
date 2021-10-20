@@ -11,6 +11,7 @@ namespace PandarosWoWLogParser.Calculators
     {
         Dictionary<string, Dictionary<MissType, long>> _damageAvoidedByEntityfromType = new Dictionary<string, Dictionary<MissType, long>>();
         Dictionary<string, long> _attacks = new Dictionary<string, long>();
+        Dictionary<string, Dictionary<string, Dictionary<MissType, long>>> _attackAvoidedByEntityFromEntity = new Dictionary<string, Dictionary<string, Dictionary<MissType, long>>>(); 
 
         public AvoidanceCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
@@ -39,7 +40,10 @@ namespace PandarosWoWLogParser.Calculators
                         var spellMissed = (IMissed)combatEvent;
 
                         if (spellMissed.MissType != MissType.ABSORB)
+                        {
                             _damageAvoidedByEntityfromType.AddValue(combatEvent.DestName, spellMissed.MissType, 1);
+                            _attackAvoidedByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, spellMissed.MissType, 1);
+                        }
                         break;
                 }
 
@@ -92,6 +96,8 @@ namespace PandarosWoWLogParser.Calculators
             }
 
             _statsReporting.ReportTable(table, "Avoidance", Fight, State);
+
+            _statsReporting.Report(_attackAvoidedByEntityFromEntity, "Avoidance by Monster by Miss Type (% of all avoidance during fight)", Fight, State);
         }
 
         public override void StartFight()

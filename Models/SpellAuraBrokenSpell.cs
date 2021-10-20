@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellAuraBrokenSpell : SpellBase, ISpellAuraBrokenSpell
+    public class SpellAuraBrokenSpell : SpellBase, ISpellAuraBrokenSpell, ISpellAura
     {
         public int ExtraSpellID { get; set; }
         public string ExtraSpellName { get; set; }

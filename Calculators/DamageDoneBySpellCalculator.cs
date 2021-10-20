@@ -48,7 +48,7 @@ namespace PandarosWoWLogParser.Calculators
 
                 case LogEvents.SPELL_DAMAGE:
                 case LogEvents.SPELL_PERIODIC_DAMAGE:
-                    var spell = (ISpellBase)combatEvent;
+                    var spell = (ISpell)combatEvent;
                     _damageSpellByPlayer.AddValue(owner, spell.SpellName, damage.Damage);
                     break;
             }

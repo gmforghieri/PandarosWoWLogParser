@@ -1,6 +1,6 @@
 ﻿namespace PandarosWoWLogParser.Models
 {
-    public interface ISpellBase
+    public interface ISpell
     {
         SpellSchool School { get; set; }
         int SpellId { get; set; }

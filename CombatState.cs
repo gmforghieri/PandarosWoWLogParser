@@ -13,6 +13,8 @@ namespace PandarosWoWLogParser
 
         public Dictionary<string, string> EntitytoOwnerMap { get; set; } = new Dictionary<string, string>();
 
+        public Dictionary<string, Dictionary<string, string>> PlayerAuras = new Dictionary<string, Dictionary<string, string>>();
+
         public bool InFight { get; set; }
 
         public void ProcessCombatEvent(ICombatEvent combatEvent)
@@ -23,31 +25,49 @@ namespace PandarosWoWLogParser
                 EntityIdToNameMap[combatEvent.DestGuid] = combatEvent.DestName;
             }
 
-            if (combatEvent.EventName == LogEvents.SPELL_SUMMON && combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Player)
+            switch (combatEvent.EventName)
             {
-                if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var list))
-                {
-                    list = new List<string>();
-                    OwnerToEntityMap[combatEvent.SourceName] = list;
-                }
+                case LogEvents.SPELL_SUMMON:
+                    if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Player)
+                    {
+                        if (!OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var list))
+                        {
+                            list = new List<string>();
+                            OwnerToEntityMap[combatEvent.SourceName] = list;
+                        }
 
-                if (!list.Contains(combatEvent.DestGuid))
-                    list.Add(combatEvent.DestGuid);
+                        if (!list.Contains(combatEvent.DestGuid))
+                            list.Add(combatEvent.DestGuid);
 
-                if (!EntitytoOwnerMap.ContainsKey(combatEvent.DestGuid))
-                    EntitytoOwnerMap.Add(combatEvent.DestGuid, combatEvent.SourceName);
-            }
+                        if (!EntitytoOwnerMap.ContainsKey(combatEvent.DestGuid))
+                            EntitytoOwnerMap.Add(combatEvent.DestGuid, combatEvent.SourceName);
+                    }
+                    break;
 
-            if (combatEvent.EventName == LogEvents.UNIT_DIED)
-            {
-                if (EntitytoOwnerMap.TryGetValue(combatEvent.DestGuid, out var ownerId))
+                case LogEvents.UNIT_DIED:
+                    if (EntitytoOwnerMap.TryGetValue(combatEvent.DestGuid, out var ownerId))
+                        EntitytoOwnerMap.Remove(combatEvent.DestGuid);
+
+                    if (OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var entities))
+                        entities.Remove(combatEvent.DestGuid);
+
                     EntitytoOwnerMap.Remove(combatEvent.DestGuid);
+                    EntityIdToNameMap.Remove(combatEvent.DestGuid);
+                    break;
 
-                if (OwnerToEntityMap.TryGetValue(combatEvent.SourceName, out var entities))
-                    entities.Remove(combatEvent.DestGuid);
+                case LogEvents.SPELL_AURA_APPLIED:
+                case LogEvents.SPELL_AURA_APPLIED_DOSE:
+                case LogEvents.SPELL_AURA_REFRESH:
+                    var spell = (ISpell)combatEvent;
+                    PlayerAuras.AddValue(combatEvent.DestName, spell.SpellName, combatEvent.SourceName);
+                    break;
 
-                EntitytoOwnerMap.Remove(combatEvent.DestGuid);
-                EntityIdToNameMap.Remove(combatEvent.DestGuid);
+                case LogEvents.SPELL_AURA_BROKEN:
+                case LogEvents.SPELL_AURA_REMOVED_DOSE:
+                case LogEvents.SPELL_AURA_BROKEN_SPELL:
+                    var removedSpell = (ISpell)combatEvent;
+                    PlayerAuras.RemoveValue(combatEvent.DestName, spell.SpellName, combatEvent.SourceName);
+                    break;
             }
         }
 

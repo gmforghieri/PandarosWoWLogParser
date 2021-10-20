@@ -23,7 +23,7 @@ namespace PandarosWoWLogParser.Calculators
         {
             if (combatEvent.SourceFlags.GetFlagType != UnitFlags.FlagType.Player)
                 return;
-            var spell = (ISpellBase)combatEvent;
+            var spell = (ISpell)combatEvent;
 
             _spellsCast.AddValue(combatEvent.SourceName, spell.SpellName, 1);
         }

@@ -50,7 +50,7 @@ namespace PandarosWoWLogParser.Calculators
                             }
                             else
                             {
-                                var spell = (ISpellBase)combatEvent;
+                                var spell = (ISpell)combatEvent;
                                 _missedAttacks.AddValue(combatEvent.SourceName, spell.SpellName, 1);
                             }
                         }

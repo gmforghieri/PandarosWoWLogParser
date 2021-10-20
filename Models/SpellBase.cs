@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PandarosWoWLogParser.Models
 {
-    public class SpellBase : CombatEventBase, ISpellBase
+    public class SpellBase : CombatEventBase, ISpell
     {
         public int SpellId { get; set; }
         public string SpellName { get; set; }

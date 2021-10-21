@@ -40,9 +40,20 @@ namespace PandarosWoWLogParser.Calculators
 
         public override void FinalizeFight()
         {
-            _statsReporting.Report(_healingDoneByPlayersTotal, "Healing Rankings", Fight, State);
+            Dictionary<string, long> totalLife = new Dictionary<string, long>();
+
+            foreach (var kvp in _healingDoneByPlayersTotal)
+                totalLife.AddValue(kvp.Key, kvp.Value);
+
+            foreach (var kvp in _overHealingDoneByPlayersTotal)
+                totalLife.AddValue(kvp.Key, kvp.Value);
+
+            _statsReporting.Report(_healingDoneByPlayersTotal, "Life Healed Rankings", Fight, State);
             _statsReporting.Report(_overHealingDoneByPlayersTotal, "Overhealed Rankings", Fight, State);
-            _statsReporting.ReportPerSecondNumbers(_healingDoneByPlayersTotal, "HPS Rankings", Fight, State);
+            _statsReporting.ReportPerSecondNumbers(_healingDoneByPlayersTotal, "Life Healed HPS Rankings", Fight, State);
+
+            _statsReporting.Report(totalLife, "Healing Output Rankings (Life Healed + Overheal)", Fight, State);
+            _statsReporting.ReportPerSecondNumbers(totalLife, "HPS Rankings (Life Healed + Overheal)", Fight, State);
         }
 
         public override void StartFight()

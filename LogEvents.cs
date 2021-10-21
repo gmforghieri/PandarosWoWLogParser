@@ -49,6 +49,7 @@ namespace PandarosWoWLogParser
         public const string ENVIRONMENTAL_DAMAGE = "ENVIRONMENTAL_DAMAGE";
         public const string ENCHANT_REMOVED = "ENCHANT_REMOVED";
         public const string ENCHANT_APPLIED = "ENCHANT_APPLIED";
+        public const string SPELL_EXTRA_ATTACKS = "SPELL_EXTRA_ATTACKS";
     }
 }
 

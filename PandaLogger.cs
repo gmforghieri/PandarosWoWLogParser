@@ -308,6 +308,9 @@ namespace PandarosWoWLogParser
 
         public void Report<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, CombatState state)
         {
+            if (stats.Count == 0)
+                return;
+
             int i = 0;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
             var total = stats.Sum(kvp => kvp.Value);
@@ -323,6 +326,8 @@ namespace PandarosWoWLogParser
 
         public void Report<T, G>(Dictionary<T, Dictionary<G, long>> stats, string name, MonitoredFight fight, CombatState state)
         {
+            if (stats.Count == 0)
+                return;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
             long total = 0;
             Dictionary<T, long> totals = new Dictionary<T, long>();
@@ -354,6 +359,8 @@ namespace PandarosWoWLogParser
 
         public void Report<T, G, B>(Dictionary<T, Dictionary<G, Dictionary<B, long>>> stats, string name, MonitoredFight fight, CombatState state)
         {
+            if (stats.Count == 0)
+                return;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
             long total = 0;
             Dictionary<T, long> totals = new Dictionary<T, long>();
@@ -401,6 +408,8 @@ namespace PandarosWoWLogParser
 
         public void ReportTable(List<List<string>> table, string name, MonitoredFight fight, CombatState state, List<int> length = default(List<int>))
         {
+            if (table.Count == 0)
+                return;
             Log("---------------------------------------------");
             Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
             Log("---------------------------------------------");

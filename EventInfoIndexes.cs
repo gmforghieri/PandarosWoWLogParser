@@ -50,6 +50,11 @@ namespace PandarosWoWLogParser.Indexes
         public const int AuraType = 9;
     }
 
+    public class SPELL_EXTRA_ATTACKS
+    {
+        public const int Amount = 9;
+    }
+
     public class SPELL_AURA_APPLIED_DOSE
     {
         public const int AuraType = 9;

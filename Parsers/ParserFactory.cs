@@ -26,7 +26,8 @@ namespace PandarosWoWLogParser.Parsers
                                ICombatParser<SpellInterrupt> spellInterruptParser,
                                ICombatParser<SpellDrain> spellDrainParser,
                                ICombatParser<Enchant> enchantParser,
-                               ICombatParser<SpellEnergize> spellEnergizeParser)
+                               ICombatParser<SpellEnergize> spellEnergizeParser,
+                               ICombatParser<SpellExtraAttacks> spellExtraAttacksParser)
         {
             Parsers.Add(LogEvents.SWING_DAMAGE, swingDamageParser.Parse);
             Parsers.Add(LogEvents.SWING_MISSED, swingmissedParser.Parse);
@@ -72,6 +73,7 @@ namespace PandarosWoWLogParser.Parsers
             Parsers.Add(LogEvents.SPELL_PERIODIC_LEECH, spellDrainParser.Parse);
             Parsers.Add(LogEvents.ENCHANT_REMOVED, enchantParser.Parse);
             Parsers.Add(LogEvents.ENCHANT_APPLIED, enchantParser.Parse);
+            Parsers.Add(LogEvents.SPELL_EXTRA_ATTACKS, spellExtraAttacksParser.Parse);
         }
 
         public CombatEventBase Parse(DateTime date, string eventName, string[] data)

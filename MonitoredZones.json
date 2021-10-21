@@ -31,5 +31,14 @@
   {
     "ZoneName": "Shattered Halls",
     "MonitoredFights": { "Warchief Kargath Bladefist": [ "Warchief Kargath Bladefist" ] }
+  },
+  {
+    "ZoneName": "Gruul's Lair'",
+    "MonitoredFights": { "High King Maulgar": [ "High King Maulgar", "Krosh Firehand", "Olm the Summoner", "Kiggler the Crazed", "Blindeye the Seer" ] },
+    "Gruul": { "Gruul": [ "Gruul" ] }
+  },
+  {
+    "ZoneName": "Magtheridon's Lair'",
+    "MonitoredFights": { "Magtheridon": [ "Magtheridon" ] }
   }
 ]

@@ -9,7 +9,7 @@ namespace PandarosWoWLogParser.Calculators
 {
     public class SpellsCastByNPCCalculator : BaseCalculator
     {
-        Dictionary<string, Dictionary<string, List<long>>> _spellsCast = new Dictionary<string, Dictionary<string, List<long>>>();
+        Dictionary<string, Dictionary<SpellSchool, Dictionary<string, List<long>>>> _spellsCast = new Dictionary<string, Dictionary<SpellSchool, Dictionary<string, List<long>>>>();
 
         public SpellsCastByNPCCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
@@ -33,21 +33,24 @@ namespace PandarosWoWLogParser.Calculators
             {
                 if (combatEvent is IDamage damage)
                 {
-                    _spellsCast.AddValue(combatEvent.SourceName, spell.SpellName, 0, 1);
-                    _spellsCast.AddValue(combatEvent.SourceName, spell.SpellName, 1, damage.Damage);
+                    _spellsCast.AddValue(combatEvent.SourceName, spell.School, spell.SpellName, 0, 1);
+                    _spellsCast.AddValue(combatEvent.SourceName, spell.School, spell.SpellName, 1, damage.Damage);
                 }
                 else
                 {
-                    if (_spellsCast.TryGetValue(combatEvent.SourceName, out var casts) && casts.TryGetValue(spell.SpellName, out var castCounts) && castCounts.Count == 1)
-                        _spellsCast.AddValue(combatEvent.SourceName, spell.SpellName, 0, 1);
-                    else if (!_spellsCast.TryGetValue(combatEvent.SourceName, out var casts2) || !casts2.ContainsKey(spell.SpellName))
-                        _spellsCast.AddValue(combatEvent.SourceName, spell.SpellName, 0, 1);
+                    if (_spellsCast.TryGetValue(combatEvent.SourceName, out var casts) && 
+                        casts.TryGetValue(spell.School, out var spellNames) &&
+                        spellNames.TryGetValue(spell.SpellName, out var castCounts) &&
+                        castCounts.Count == 1)
+                        _spellsCast.AddValue(combatEvent.SourceName, spell.School, spell.SpellName, 0, 1);
+                    else 
+                        _spellsCast.AddValue(combatEvent.SourceName, spell.School, spell.SpellName, 0, 1);
                 }
             }
             else if (combatEvent is IDamage damage)
             {
-                _spellsCast.AddValue(combatEvent.SourceName, "Swing", 0, 1);
-                _spellsCast.AddValue(combatEvent.SourceName, "Swing", 1, damage.Damage);
+                _spellsCast.AddValue(combatEvent.SourceName, SpellSchool.Physical, "Swing", 0, 1);
+                _spellsCast.AddValue(combatEvent.SourceName, SpellSchool.Physical, "Swing", 1, damage.Damage);
             }
                 
         }
@@ -58,6 +61,7 @@ namespace PandarosWoWLogParser.Calculators
             table.Add(new List<string>()
             {
                 "NPC",
+                "School",
                 "Attack",
                 "Count",
                 "Damage"
@@ -66,6 +70,7 @@ namespace PandarosWoWLogParser.Calculators
             var length = new List<int>()
             {
                 45,
+                13,
                 30,
                 13,
                 13
@@ -78,27 +83,41 @@ namespace PandarosWoWLogParser.Calculators
                     npc.Key,
                     string.Empty,
                     string.Empty,
+                    string.Empty,
                     string.Empty
                 });
-
-                foreach (var attack in npc.Value)
+                foreach (var school in npc.Value)
                 {
-                    if (attack.Value.Count == 2)
-                        table.Add(new List<string>()
-                        {
-                            string.Empty,
-                            attack.Key,
-                            attack.Value[0].ToString("N"),
-                            attack.Value[1].ToString("N")
-                        });
-                    else
-                        table.Add(new List<string>()
-                        {
-                            string.Empty,
-                            attack.Key,
-                            attack.Value[0].ToString("N"),
-                            "N/A"
-                        });
+                    table.Add(new List<string>()
+                    {
+                        string.Empty,
+                        school.Key.ToString(),
+                        string.Empty,
+                        string.Empty,
+                        string.Empty
+                    });
+
+                    foreach (var attack in school.Value)
+                    {
+                        if (attack.Value.Count == 2)
+                            table.Add(new List<string>()
+                            {
+                                string.Empty,
+                                string.Empty,
+                                attack.Key,
+                                attack.Value[0].ToString("N"),
+                                attack.Value[1].ToString("N")
+                            });
+                        else
+                            table.Add(new List<string>()
+                            {
+                                string.Empty,
+                                string.Empty,
+                                attack.Key,
+                                attack.Value[0].ToString("N"),
+                                "N/A"
+                            });
+                    }
                 }
             }
 

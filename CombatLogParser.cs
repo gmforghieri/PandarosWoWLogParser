@@ -97,6 +97,7 @@ namespace PandarosWoWLogParser
                                 {
                                     state.ProcessCombatEvent(fightEvent);
                                     factory.CalculateEvent(fightEvent);
+                                    _calculatorFactory.CalculateEvent(fightEvent);
                                 }
 
                                 factory.FinalizeFight();

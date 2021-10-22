@@ -8,7 +8,7 @@ namespace PandarosWoWLogParser.Calculators
 {
     public class DamageTakenCalculator : BaseCalculator
     {
-        Dictionary<string, Dictionary<string, long>> _damageTakenByEntityFromEntity = new Dictionary<string, Dictionary<string, long>>();
+        Dictionary<string, Dictionary<string, Dictionary<string, List<long>>>> _damageTakenByEntityFromEntity = new Dictionary<string, Dictionary<string, Dictionary<string, List<long>>>>();
 
         public DamageTakenCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
@@ -29,13 +29,81 @@ namespace PandarosWoWLogParser.Calculators
 
             if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Npc && combatEvent.DestFlags.GetFlagType == UnitFlags.FlagType.Player)
             {
-                _damageTakenByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, damage.Damage);
+
+                if (combatEvent.EventName == LogEvents.SPELL_DAMAGE ||
+                    combatEvent.EventName == LogEvents.SPELL_DAMAGE ||
+                    combatEvent.EventName == LogEvents.SPELL_DAMAGE ||
+                    combatEvent.EventName == LogEvents.SPELL_DAMAGE)
+                {
+                    var spell = (ISpell)combatEvent;
+                    _damageTakenByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, spell.SpellName, 0, 1);
+                    _damageTakenByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, spell.SpellName, 1, damage.Damage);
+                }
+                else
+                {
+                    _damageTakenByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, "Swing", 0, 1);
+                    _damageTakenByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, "Swing", 1, damage.Damage);
+                }
             }
         }
 
         public override void FinalizeFight()
         {
-            _statsReporting.Report(_damageTakenByEntityFromEntity, "Damage Taken", Fight, State);
+            List<List<string>> table = new List<List<string>>();
+            table.Add(new List<string>()
+            {
+                "Player",
+                "NPC",
+                "Attack",
+                "Count",
+                "Damage"
+            });
+
+            var length = new List<int>()
+            {
+                20,
+                35,
+                30,
+                13,
+                13
+            };
+
+            foreach (var pc in _damageTakenByEntityFromEntity)
+            {
+                table.Add(new List<string>()
+                {
+                    pc.Key,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty
+                });
+                foreach (var npc in pc.Value)
+                {
+                    table.Add(new List<string>()
+                    {
+                        string.Empty,
+                        npc.Key,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty
+                    });
+
+                    foreach (var attack in npc.Value)
+                    {
+                        table.Add(new List<string>()
+                        {
+                            string.Empty,
+                            string.Empty,
+                            attack.Key,
+                            attack.Value[0].ToString("N"),
+                            attack.Value[1].ToString("N")
+                        });
+                    }
+                }
+            }
+
+            _statsReporting.ReportTable(table, "Damage Taken", Fight, State, length);
         }
 
         public override void StartFight()

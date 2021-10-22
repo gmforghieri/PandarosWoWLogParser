@@ -39,7 +39,10 @@ namespace PandarosWoWLogParser.Calculators
                     case LogEvents.SPELL_MISSED:
                         var spellMissed = (IMissed)combatEvent;
 
-                        if (spellMissed.MissType != MissType.ABSORB)
+                        if (spellMissed.MissType != MissType.ABSORB && 
+                            spellMissed.MissType != MissType.REFLECT && 
+                            spellMissed.MissType != MissType.IMMUNE &&
+                            spellMissed.MissType != MissType.EVADE)
                         {
                             _damageAvoidedByEntityfromType.AddValue(combatEvent.DestName, spellMissed.MissType, 1);
                             _attackAvoidedByEntityFromEntity.AddValue(combatEvent.DestName, combatEvent.SourceName, spellMissed.MissType, 1);
@@ -55,6 +58,9 @@ namespace PandarosWoWLogParser.Calculators
             List<List<string>> table = new List<List<string>>();
             var enums = Enum.GetValues(typeof(MissType)).Cast<MissType>().ToList();
             enums.Remove(MissType.ABSORB);
+            enums.Remove(MissType.REFLECT);
+            enums.Remove(MissType.IMMUNE);
+            enums.Remove(MissType.EVADE);
             var all = enums.Select(e => e.ToString()).ToList();
             var total = _attacks.Sum(kvp => kvp.Value);
             all.Insert(0, $"Overall");

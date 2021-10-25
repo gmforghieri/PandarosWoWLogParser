@@ -77,7 +77,7 @@ namespace PandarosWoWLogParser
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
 
             builder.RegisterInstance(monitoredZones);
-            builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>().SingleInstance();
+            builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>();
             builder.RegisterType<CombatLogParser>();
         }
     }

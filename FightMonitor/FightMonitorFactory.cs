@@ -24,12 +24,8 @@ namespace PandarosWoWLogParser.FightMonitor
 
         public Dictionary<string, Tuple<string, MonitoredZone>> MonitoredBosses { get; set; } = new Dictionary<string, Tuple<string, MonitoredZone>>();
 
-        public bool IsInFight { get; set; }
-
-        public MonitoredFight CurrentFight { get; set; }
         IPandaLogger _logger;
         IStatsReporter _reporter;
-        ICalculatorFactory _calculatorFactory;
 
         public FightMonitorFactory(List<MonitoredZone> monitoredZones, IPandaLogger logger, IStatsReporter reporter)
         {
@@ -45,48 +41,40 @@ namespace PandarosWoWLogParser.FightMonitor
 
         public bool IsMonitoredFight(ICombatEvent evnt, CombatState state)
         {
-            if (!IsInFight && CombatEventsTriggerInFight.Contains(evnt.EventName))
+            if (!state.InFight && CombatEventsTriggerInFight.Contains(evnt.EventName))
             {
                 if (MonitoredBosses.ContainsKey(evnt.DestName))
                 {
-                    IsInFight = true;
-                    CurrentFight = new MonitoredFight()
+                    state.InFight = true;
+                    state.CurrentFight = new MonitoredFight()
                     {
                         CurrentZone = MonitoredBosses[evnt.DestName].Item2,
                         BossName = MonitoredBosses[evnt.DestName].Item1,
                         FightStart = evnt.Timestamp,
                         MonsterID = new Dictionary<string, bool>() { { evnt.DestName, false } }
                     };
-                    _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, CurrentFight);
+                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state);
                 }
                 else if (MonitoredBosses.ContainsKey(evnt.SourceName))
                 {
-                    IsInFight = true;
-                    CurrentFight = new MonitoredFight()
+                    state.InFight = true;
+                    state.CurrentFight = new MonitoredFight()
                     {
                         CurrentZone = MonitoredBosses[evnt.SourceName].Item2,
                         BossName = MonitoredBosses[evnt.SourceName].Item1,
                         FightStart = evnt.Timestamp,
                         MonsterID = new Dictionary<string, bool>() { { evnt.SourceName, false } }
                     };
-                    _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, CurrentFight);
+                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state);
                 }
             }
 
-            if (IsInFight)
+            if (state.InFight)
             {
-                IsInFight = CurrentFight.AddEvent(evnt, state);
+                state.InFight = state.CurrentFight.AddEvent(evnt, state);
             }
 
-
-            return IsInFight;
-        }
-
-        public Tuple<MonitoredFight, ICalculatorFactory> GetFight()
-        {
-            var retval = Tuple.Create(CurrentFight, _calculatorFactory);
-            CurrentFight = null;
-            return retval;
+            return state.InFight;
         }
     }
 }

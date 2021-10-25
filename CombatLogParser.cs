@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using PandarosWoWLogParser.Models;
 using System.Threading.Tasks;
 using PandarosWoWLogParser.Parsers;
-using Autofac;
 using PandarosWoWLogParser.Calculators;
 using PandarosWoWLogParser.FightMonitor;
 
@@ -13,10 +12,6 @@ namespace PandarosWoWLogParser
 {
     public class CombatLogParser
     {
-        public bool IsParsing { get; private set; } = false;
-        public float ParseCompletionPercent { get; private set; } = 0f;
-        public FileInfo FileInfo { get; private set; }
-
         IParserFactory _parserFactory;
         IFightMonitorFactory _fightMonitorFactory;
         IPandaLogger _logger;
@@ -30,26 +25,19 @@ namespace PandarosWoWLogParser
             _reporter = reporter;
         }
 
-        public int ParseToEnd(string filepath)
+        public void ParseToEnd(string filepath)
         {
-            if (IsParsing)
-                return -1;
-
-            ParseCompletionPercent = 0f;
-            IsParsing = true;
-            var count = 0;
+            FileInfo fileToParse;
 
             if (File.Exists(filepath))
             {
-                FileInfo = new FileInfo(filepath);
+                fileToParse = new FileInfo(filepath);
             }
             else
                 throw new FileNotFoundException("Combat Log not found", filepath);
 
-            Dictionary<string, int> unknown = new Dictionary<string, int>();
-            Dictionary<string, int> eventCount = new Dictionary<string, int>();
-            bool isInFight = false;
-            CombatState state = new CombatState();
+
+            CombatState state = new CombatState(_parserFactory, _fightMonitorFactory, _logger, _reporter);
             MonitoredFight allFights = new MonitoredFight()
             {
                 CurrentZone = new MonitoredZone()
@@ -60,9 +48,9 @@ namespace PandarosWoWLogParser
                 BossName = "All Fights in Log"
             };
 
-            ICalculatorFactory _calculatorFactory = new CalculatorFactory(_logger, _reporter, state, allFights);
+            state.AllFights = allFights;
 
-            using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (FileStream fs = new FileStream(fileToParse.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (StreamReader sr = new StreamReader(fs))
                 {
@@ -72,80 +60,12 @@ namespace PandarosWoWLogParser
                     {
                         string line = sr.ReadLine();
                         CombatEventBase evt = ParseLine(line, out string evtStr);
-                        count++;
 
-                        if (evt == null)
-                        {
-                            if (!string.IsNullOrEmpty(evtStr))
-                                unknown.AddValue(evtStr, 1);
-                        }
-                        else
-                        {
-                            eventCount.AddValue(evt.EventName, 1);
-
-                            if (_fightMonitorFactory.IsMonitoredFight(evt, state))
-                                isInFight = true;
-                            else if (isInFight)
-                            {
-                                var tpl = _fightMonitorFactory.GetFight();
-                                var fight = tpl.Item1;
-                                var factory = tpl.Item2;
-
-                                factory.StartFight();
-
-                                foreach (var fightEvent in fight.MonitoredFightEvents)
-                                {
-                                    state.ProcessCombatEvent(fightEvent);
-                                    factory.CalculateEvent(fightEvent);
-                                    _calculatorFactory.CalculateEvent(fightEvent);
-                                }
-
-                                factory.FinalizeFight();
-
-                                foreach (var unmonitoredEvent in fight.NotMonitoredFightEvents)
-                                {
-                                    state.ProcessCombatEvent(unmonitoredEvent);
-                                    _calculatorFactory.CalculateEvent(unmonitoredEvent);
-                                }
-
-                                isInFight = false;
-                            }
-                            else
-                            {
-                                state.ProcessCombatEvent(evt);
-                                _calculatorFactory.CalculateEvent(evt);
-                            }
-                            
-                        }
-
-                        long cur = fs.Position;
-                        long total = fs.Length;
-                        long deltaCur = cur - startPos;
-                        long deltaTotal = total - startPos;
-
-                        ParseCompletionPercent = (float)deltaCur / (float)deltaTotal;
+                        state.ProcessCombatEvent(evt, evtStr);
                     }
 
                 }
             }
-
-            IsParsing = false;
-            _logger.Log($"``````````````````````````````````````````````````````````````");
-            _logger.Log($"Number of unknown events: {unknown.Count}");
-            _logger.Log($"--------------------------------------------------------------");
-            foreach (var ev in unknown)
-                _logger.Log($"{ev.Key}: {ev.Value}");
-            _logger.Log($"``````````````````````````````````````````````````````````````");
-
-            _logger.Log($"Number of known events: {eventCount.Count}");
-            _logger.Log($"--------------------------------------------------------------");
-            foreach (var ev in eventCount)
-                _logger.Log($"{ev.Key}: {ev.Value}");
-            _logger.Log($"``````````````````````````````````````````````````````````````");
-
-            _calculatorFactory.FinalizeFight();
-
-            return count;
         }
 
 

@@ -11,17 +11,48 @@ using PandarosWoWLogParser.FightMonitor;
 using System.Configuration;
 using Newtonsoft.Json;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PandarosWoWLogParser
 {
-    class Program
+    public static class PandarosParser
     {
-        public static IContainer Container { get; set; }
-
-        static void Main(string[] args)
+        public static void PandarosParserSetup(this IServiceCollection services, IPandaLogger logger, IStatsReporter statsReporter)
         {
-            var builder = new ContainerBuilder();
-            var logger = new PandaLogger(ConfigurationManager.AppSettings.Get("outputDir"));
+            //var logger = new PandaLogger(ConfigurationManager.AppSettings.Get("outputDir"));
+            var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
+
+            services.AddSingleton(monitoredZones);
+            services.AddSingleton<IPandaLogger>(logger);
+            services.AddSingleton<IStatsReporter>(statsReporter);
+            services.AddSingleton<ICombatParser<SpellDamage>, SpellDamageParser>();
+            services.AddSingleton<ICombatParser<SwingDamage>, SwingDamageParser>();
+            services.AddSingleton<ICombatParser<SpellFailed>, SpellFailedParser>();
+            services.AddSingleton<ICombatParser<SpellBase>, SpellParser>();
+            services.AddSingleton<ICombatParser<SpellEnergize>, SpellEnergizeParser>();
+            services.AddSingleton<ICombatParser<SpellAura>, SpellAuraParser>();
+            services.AddSingleton<ICombatParser<SpellAuraDose>, SpellAuraDoseParser>();
+            services.AddSingleton<ICombatParser<SpellAuraBrokenSpell>, SpellAuraBrokenSpellParser>();
+            services.AddSingleton<ICombatParser<SpellMissed>, SpellMissedParser>();
+            services.AddSingleton<ICombatParser<SwingMissed>, SwingMissedParser>();
+            services.AddSingleton<ICombatParser<SpellHeal>, SpellHealParser>();
+            services.AddSingleton<ICombatParser<CombatEventBase>, BaseParser>();
+            services.AddSingleton<ICombatParser<EnviormentalDamage>, EnviormentalDamageParser>();
+            services.AddSingleton<ICombatParser<SpellInterrupt>, SpellInterruptParser>();
+            services.AddSingleton<ICombatParser<SpellDispel>, SpellDispelParser>();
+            services.AddSingleton<ICombatParser<SpellDrain>, SpellDrainParser>();
+            services.AddSingleton<ICombatParser<Enchant>, EnchantParser>();
+            services.AddSingleton<ICombatParser<SpellExtraAttacks>, SpellExtraAttacksParser>();
+            services.AddSingleton<IParserFactory, ParserFactory>();
+            services.AddScoped<IFightMonitorFactory, FightMonitorFactory>();
+            services.AddScoped<CombatLogParser>();
+        }
+
+        public static void PandarosParserSetup(this ContainerBuilder builder, IPandaLogger logger, IStatsReporter statsReporter)
+        {
+            //var logger = new PandaLogger(ConfigurationManager.AppSettings.Get("outputDir"));
+            var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
+
             builder.RegisterInstance(logger).As<IPandaLogger>().SingleInstance();
             builder.RegisterInstance(logger).As<IStatsReporter>().SingleInstance();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
@@ -45,22 +76,9 @@ namespace PandarosWoWLogParser
             builder.RegisterType<SpellExtraAttacksParser>().As<ICombatParser<SpellExtraAttacks>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
 
-            var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
             builder.RegisterInstance(monitoredZones);
             builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>().SingleInstance();
             builder.RegisterType<CombatLogParser>();
-
-            Container = builder.Build();
-
-            var clp = Container.Resolve<CombatLogParser>();
-
-            logger.Log("Starting Parse.");
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            var count = clp.ParseToEnd(ConfigurationManager.AppSettings.Get("logfile"));
-            sw.Stop();
-            logger.Log($"Parsed {count} events in {sw.Elapsed}.");
-            Thread.Sleep(1000);
         }
     }
 }

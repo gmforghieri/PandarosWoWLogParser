@@ -1,5 +1,8 @@
 ﻿using CombatLogParser;
+using PandarosWoWLogParser.Calculators;
+using PandarosWoWLogParser.FightMonitor;
 using PandarosWoWLogParser.Models;
+using PandarosWoWLogParser.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +11,24 @@ namespace PandarosWoWLogParser
 {
     public class CombatState
     {
+        IParserFactory _parserFactory;
+        IFightMonitorFactory _fightMonitorFactory;
+        IPandaLogger _logger;
+        IStatsReporter _reporter;
+        Dictionary<string, int> unknown = new Dictionary<string, int>();
+        Dictionary<string, int> eventCount = new Dictionary<string, int>();
+        bool _prevFightState = false;
+        ICalculatorFactory _allFightsCalculatorFactory;
+
+        public CombatState(IParserFactory parserFactory, IFightMonitorFactory fightMonitorFactory, IPandaLogger logger, IStatsReporter reporter)
+        {
+            _parserFactory = parserFactory;
+            _fightMonitorFactory = fightMonitorFactory;
+            _logger = logger;
+            _reporter = reporter;
+            _allFightsCalculatorFactory = new CalculatorFactory(_logger, _reporter, this);
+        }
+
         public Dictionary<string, string> EntityIdToNameMap { get; set; } = new Dictionary<string, string>();
 
         public Dictionary<string, List<string>> OwnerToEntityMap { get; set; } = new Dictionary<string, List<string>>();
@@ -18,8 +39,54 @@ namespace PandarosWoWLogParser
         public Dictionary<string, Dictionary<string, string>> PlayerDebuffs { get; set; } = new Dictionary<string, Dictionary<string, string>>();
 
         public bool InFight { get; set; }
+        public MonitoredFight CurrentFight { get; set; }
+        public MonitoredFight AllFights { get; set; }
+        public CalculatorFactory CalculatorFactory { get; set; }
 
-        public void ProcessCombatEvent(ICombatEvent combatEvent)
+        public void ProcessCombatEvent(ICombatEvent combatEvent, string evtStr)
+        {
+            if (combatEvent == null)
+            {
+                if (!string.IsNullOrEmpty(evtStr))
+                    unknown.AddValue(evtStr, 1);
+            }
+            else
+            {
+                eventCount.AddValue(combatEvent.EventName, 1);
+
+                if (_fightMonitorFactory.IsMonitoredFight(combatEvent, this))
+                    _prevFightState = true;
+                else if (_prevFightState)
+                {
+                    CalculatorFactory.StartFight();
+
+                    foreach (var fightEvent in CurrentFight.MonitoredFightEvents)
+                    {
+                        ProcessCombatEventInternal(fightEvent);
+                        CalculatorFactory.CalculateEvent(fightEvent);
+                        _allFightsCalculatorFactory.CalculateEvent(fightEvent);
+                    }
+
+                    CalculatorFactory.FinalizeFight();
+
+                    foreach (var unmonitoredEvent in CurrentFight.NotMonitoredFightEvents)
+                    {
+                        ProcessCombatEventInternal(unmonitoredEvent);
+                        _allFightsCalculatorFactory.CalculateEvent(unmonitoredEvent);
+                    }
+
+                    _prevFightState = false;
+                    CleanUpFight();
+                }
+                else
+                {
+                    ProcessCombatEventInternal(combatEvent);
+                    _allFightsCalculatorFactory.CalculateEvent(combatEvent);
+                }
+
+            }
+        }
+        private void ProcessCombatEventInternal(ICombatEvent combatEvent)
         {
             if (combatEvent.DestName != "nil" &&
                 combatEvent.DestFlags.GetFlagType != UnitFlags.FlagType.Player)
@@ -78,6 +145,7 @@ namespace PandarosWoWLogParser
                     PlayerDebuffs.RemoveValue(combatEvent.DestName, removedSpell.SpellName);
                     break;
             }
+            
         }
 
         public string GetEntityPrintName(string id)
@@ -93,6 +161,29 @@ namespace PandarosWoWLogParser
             owner = null;
             return combatEvent.SourceFlags.GetController == UnitFlags.Controller.Player &&
                 EntitytoOwnerMap.TryGetValue(combatEvent.SourceGuid, out owner);
+        }
+
+        public void CleanUpFight()
+        {
+            CalculatorFactory = null;
+            CurrentFight = null;
+        }
+
+        public void ParseComplete()
+        {
+            _allFightsCalculatorFactory.FinalizeFight();
+            _logger.Log($"``````````````````````````````````````````````````````````````");
+            _logger.Log($"Number of unknown events: {unknown.Count}");
+            _logger.Log($"--------------------------------------------------------------");
+            foreach (var ev in unknown)
+                _logger.Log($"{ev.Key}: {ev.Value}");
+            _logger.Log($"``````````````````````````````````````````````````````````````");
+
+            _logger.Log($"Number of known events: {eventCount.Count}");
+            _logger.Log($"--------------------------------------------------------------");
+            foreach (var ev in eventCount)
+                _logger.Log($"{ev.Key}: {ev.Value}");
+            _logger.Log($"``````````````````````````````````````````````````````````````");
         }
     }
 }

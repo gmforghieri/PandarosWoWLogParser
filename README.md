@@ -6,7 +6,7 @@ Uses DI via Autofac or Service builder.
 
 Example:
 
-```
+```c#
 using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PandarosWoWLogParser;

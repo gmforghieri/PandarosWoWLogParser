@@ -53,7 +53,7 @@ namespace PandarosWoWLogParser.FightMonitor
                         FightStart = evnt.Timestamp,
                         MonsterID = new Dictionary<string, bool>() { { evnt.DestName, false } }
                     };
-                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state);
+                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state, state.CurrentFight);
                 }
                 else if (MonitoredBosses.ContainsKey(evnt.SourceName))
                 {
@@ -65,7 +65,7 @@ namespace PandarosWoWLogParser.FightMonitor
                         FightStart = evnt.Timestamp,
                         MonsterID = new Dictionary<string, bool>() { { evnt.SourceName, false } }
                     };
-                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state);
+                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state, state.CurrentFight);
                 }
             }
 

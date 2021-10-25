@@ -26,7 +26,19 @@ namespace PandarosWoWLogParser
             _fightMonitorFactory = fightMonitorFactory;
             _logger = logger;
             _reporter = reporter;
-            _allFightsCalculatorFactory = new CalculatorFactory(_logger, _reporter, this);
+            MonitoredFight allFights = new MonitoredFight()
+            {
+                CurrentZone = new MonitoredZone()
+                {
+                    ZoneName = "All",
+                    MonitoredFights = new Dictionary<string, List<string>>()
+                },
+                BossName = "All Fights in Log"
+            };
+
+            AllFights = allFights;
+
+            _allFightsCalculatorFactory = new CalculatorFactory(_logger, _reporter, this, allFights);
         }
 
         public Dictionary<string, string> EntityIdToNameMap { get; set; } = new Dictionary<string, string>();

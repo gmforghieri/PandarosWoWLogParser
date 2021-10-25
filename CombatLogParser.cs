@@ -38,17 +38,6 @@ namespace PandarosWoWLogParser
 
 
             CombatState state = new CombatState(_parserFactory, _fightMonitorFactory, _logger, _reporter);
-            MonitoredFight allFights = new MonitoredFight()
-            {
-                CurrentZone = new MonitoredZone()
-                {
-                    ZoneName = "All",
-                    MonitoredFights = new Dictionary<string, List<string>>()
-                },
-                BossName = "All Fights in Log"
-            };
-
-            state.AllFights = allFights;
 
             using (FileStream fs = new FileStream(fileToParse.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
@@ -66,6 +55,8 @@ namespace PandarosWoWLogParser
 
                 }
             }
+
+            state.ParseComplete();
         }
 
 

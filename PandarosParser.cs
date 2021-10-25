@@ -54,7 +54,7 @@ namespace PandarosWoWLogParser
             var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
 
             builder.RegisterInstance(logger).As<IPandaLogger>().SingleInstance();
-            builder.RegisterInstance(logger).As<IStatsReporter>().SingleInstance();
+            builder.RegisterInstance(statsReporter).As<IStatsReporter>().SingleInstance();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
             builder.RegisterType<SwingDamageParser>().As<ICombatParser<SwingDamage>>().SingleInstance();
             builder.RegisterType<SpellFailedParser>().As<ICombatParser<SpellFailed>>().SingleInstance();

@@ -46,6 +46,7 @@ namespace PandarosWoWLogParser
             services.AddSingleton<IParserFactory, ParserFactory>();
             services.AddScoped<IFightMonitorFactory, FightMonitorFactory>();
             services.AddScoped<CombatLogParser>();
+            services.AddSingleton<CombatLogCombiner>();
         }
 
         public static void PandarosParserSetup(this ContainerBuilder builder, IPandaLogger logger, IStatsReporter statsReporter)
@@ -79,6 +80,7 @@ namespace PandarosWoWLogParser
             builder.RegisterInstance(monitoredZones);
             builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>();
             builder.RegisterType<CombatLogParser>();
+            builder.RegisterType<CombatLogCombiner>().SingleInstance();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,10 +70,8 @@ namespace PandarosWoWLogParser
         const string DOT_LOG = ".log";
         static readonly char[] dot = new char[] { '.' };
         const int LOGGER_TRY = 1000;
-        Thread _thread;
-        Queue<string> _logQueue = new Queue<string>();
-        AutoResetEvent _loggerSemaphore = new AutoResetEvent(false);
         string _logFile;
+        StreamWriter _sw;
 
         public PandaLogger(string logDir)
         {
@@ -87,9 +86,13 @@ namespace PandarosWoWLogParser
             LOG_NAME = "PandarosLogParser." + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
 
             _logFile = LOG_DIR + LOG_NAME + DOT_LOG;
-            _thread = new Thread(new ThreadStart(Log));
-            _thread.IsBackground = true;
-            _thread.Start();
+            _sw = new StreamWriter(_logFile, true);
+            Process.GetCurrentProcess().Exited += PandaLogger_Exited;
+        }
+
+        private void PandaLogger_Exited(object sender, EventArgs e)
+        {
+            _sw.Dispose();
         }
 
         public void Log(string message, params object[] args)
@@ -116,13 +119,9 @@ namespace PandarosWoWLogParser
 
         public void LogError(Exception e)
         {
-            lock (_logQueue)
-            {
-                _logQueue.Enqueue(e.Message);
-                _logQueue.Enqueue(e.StackTrace);
-            }
-            _loggerSemaphore.Set();
-
+            LogInternal(e.Message);
+            LogInternal(e.StackTrace);
+ 
             if (e.InnerException != null)
                 LogError(e.InnerException);
         }
@@ -131,42 +130,24 @@ namespace PandarosWoWLogParser
         {
             message = string.Format("[{0}] {1}", DateTime.Now, message);
 
-            lock (_logQueue)
-                _logQueue.Enqueue(message);
-            _loggerSemaphore.Set();
+            LogInternal(message);
             return message;
         }
 
-        private void Log()
+        private void LogInternal(string message)
         {
-            while (true)
-            {
-                _loggerSemaphore.WaitOne(2000);
+           
+            if (!string.IsNullOrEmpty(message))
+                try
+                {
+                    Console.WriteLine(message);
+                    _sw.WriteLine(message);
+                }
+                finally
+                {
 
-                using (var sw = new StreamWriter(_logFile, true))
-                    while (_logQueue.Count != 0)
-                    {
-                        var queuedMessage = string.Empty;
-
-                        lock (_logQueue)
-                            queuedMessage = _logQueue.Dequeue();
-
-                        if (!string.IsNullOrEmpty(queuedMessage))
-                        {
-                            try
-                            {
-                                Console.WriteLine(queuedMessage);
-                                sw.WriteLine(queuedMessage);
-                            }
-                            finally
-                            {
-
-                            }
-                        }
-                    }
-
-                RotateLogs();
-            }
+                }
+            RotateLogs();
         }
 
         private void RotateLogs()

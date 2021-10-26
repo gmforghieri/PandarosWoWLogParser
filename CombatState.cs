@@ -11,7 +11,6 @@ namespace PandarosWoWLogParser
 {
     public class CombatState
     {
-        IParserFactory _parserFactory;
         IFightMonitorFactory _fightMonitorFactory;
         IPandaLogger _logger;
         IStatsReporter _reporter;
@@ -20,9 +19,8 @@ namespace PandarosWoWLogParser
         bool _prevFightState = false;
         ICalculatorFactory _allFightsCalculatorFactory;
 
-        public CombatState(IParserFactory parserFactory, IFightMonitorFactory fightMonitorFactory, IPandaLogger logger, IStatsReporter reporter)
+        public CombatState(IFightMonitorFactory fightMonitorFactory, IPandaLogger logger, IStatsReporter reporter)
         {
-            _parserFactory = parserFactory;
             _fightMonitorFactory = fightMonitorFactory;
             _logger = logger;
             _reporter = reporter;
@@ -66,6 +64,9 @@ namespace PandarosWoWLogParser
             {
                 eventCount.AddValue(combatEvent.EventName, 1);
 
+                ProcessCombatEventInternal(combatEvent);
+                _allFightsCalculatorFactory.CalculateEvent(combatEvent);
+
                 if (_fightMonitorFactory.IsMonitoredFight(combatEvent, this))
                     _prevFightState = true;
                 else if (_prevFightState)
@@ -74,26 +75,13 @@ namespace PandarosWoWLogParser
 
                     foreach (var fightEvent in CurrentFight.MonitoredFightEvents)
                     {
-                        ProcessCombatEventInternal(fightEvent);
                         CalculatorFactory.CalculateEvent(fightEvent);
-                        _allFightsCalculatorFactory.CalculateEvent(fightEvent);
                     }
 
                     CalculatorFactory.FinalizeFight();
 
-                    foreach (var unmonitoredEvent in CurrentFight.NotMonitoredFightEvents)
-                    {
-                        ProcessCombatEventInternal(unmonitoredEvent);
-                        _allFightsCalculatorFactory.CalculateEvent(unmonitoredEvent);
-                    }
-
                     _prevFightState = false;
                     CleanUpFight();
-                }
-                else
-                {
-                    ProcessCombatEventInternal(combatEvent);
-                    _allFightsCalculatorFactory.CalculateEvent(combatEvent);
                 }
 
             }

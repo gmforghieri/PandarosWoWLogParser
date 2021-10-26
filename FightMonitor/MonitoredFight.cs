@@ -13,8 +13,7 @@ namespace PandarosWoWLogParser.FightMonitor
         public DateTime FightStart { get; set; }
         public DateTime FightEnd { get; set; }
         public List<ICombatEvent> MonitoredFightEvents { get; set; } = new List<ICombatEvent>();
-        public List<ICombatEvent> NotMonitoredFightEvents { get; set; } = new List<ICombatEvent>();
-        DateTime _lastKnownLog;
+        ICombatEvent _lastKnownLog;
 
         public bool AddEvent(ICombatEvent combatEvent, CombatState state)
         {
@@ -45,21 +44,23 @@ namespace PandarosWoWLogParser.FightMonitor
             }
 
             // havent seen a monster
-            if (!MonsterID.ContainsKey(combatEvent.DestGuid) && !MonsterID.ContainsKey(combatEvent.SourceGuid))
+            if (_lastKnownLog != null && !MonsterID.ContainsKey(combatEvent.DestGuid) && !MonsterID.ContainsKey(combatEvent.SourceGuid))
             {
-                var ts = combatEvent.Timestamp.Subtract(_lastKnownLog);
+                var ts = combatEvent.Timestamp.Subtract(_lastKnownLog.Timestamp);
 
                 if (ts.TotalSeconds > 90)
                     combatOver = true;
             }
             else if (FightMonitorFactory.CombatEventsTriggerInFight.Contains(combatEvent.EventName))
-                _lastKnownLog = combatEvent.Timestamp;
+                _lastKnownLog = combatEvent;
+
+            var NotMonitoredFightEvents = new List<ICombatEvent>();
 
             if (combatOver)
             {
                 for (int i = MonitoredFightEvents.Count - 1; i != 0; i--)
                 {
-                    if (MonsterID.ContainsKey(MonitoredFightEvents[i].DestGuid) || MonsterID.ContainsKey(MonitoredFightEvents[i].SourceGuid))
+                    if (MonitoredFightEvents[i] == _lastKnownLog)
                     {
                         FightEnd = MonitoredFightEvents[i].Timestamp;
                         break;
@@ -73,7 +74,6 @@ namespace PandarosWoWLogParser.FightMonitor
                 foreach (var unmonitor in NotMonitoredFightEvents)
                     MonitoredFightEvents.Remove(unmonitor);
 
-                NotMonitoredFightEvents.Reverse();
                 return false;
             }
 

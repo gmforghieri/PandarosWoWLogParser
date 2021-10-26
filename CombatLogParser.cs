@@ -37,7 +37,7 @@ namespace PandarosWoWLogParser
                 throw new FileNotFoundException("Combat Log not found", filepath);
 
 
-            CombatState state = new CombatState(_parserFactory, _fightMonitorFactory, _logger, _reporter);
+            CombatState state = new CombatState(_fightMonitorFactory, _logger, _reporter);
 
             using (FileStream fs = new FileStream(fileToParse.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {

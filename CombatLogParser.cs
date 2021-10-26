@@ -85,7 +85,7 @@ namespace PandarosWoWLogParser
             DateTime time;
 
             //This should never error, as the date format is expected to be identical every time
-            time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond)).ToUniversalTime();
+            time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond));
 
             return _parserFactory.Parse(time, evt, dataArray);
         }

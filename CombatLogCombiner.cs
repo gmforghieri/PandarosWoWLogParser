@@ -36,8 +36,8 @@ namespace PandarosWoWLogParser
         {
             // key by ticks to sort later
             Dictionary<string, Dictionary<long, InternalLogEntry>> masterLog = new Dictionary<string, Dictionary<long, InternalLogEntry>>();
-            var minTime = -2000000;
-            var maxTime = 2000000;
+            var minTime = -20000000;
+            var maxTime = 20000000;
 
             foreach (var file in Directory.GetFiles(folderPath))
             {

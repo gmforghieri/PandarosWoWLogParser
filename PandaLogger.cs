@@ -71,7 +71,6 @@ namespace PandarosWoWLogParser
         static readonly char[] dot = new char[] { '.' };
         const int LOGGER_TRY = 1000;
         string _logFile;
-        StreamWriter _sw;
 
         public PandaLogger(string logDir)
         {
@@ -86,13 +85,6 @@ namespace PandarosWoWLogParser
             LOG_NAME = "PandarosLogParser." + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
 
             _logFile = LOG_DIR + LOG_NAME + DOT_LOG;
-            _sw = new StreamWriter(_logFile, true);
-            Process.GetCurrentProcess().Exited += PandaLogger_Exited;
-        }
-
-        private void PandaLogger_Exited(object sender, EventArgs e)
-        {
-            _sw.Dispose();
         }
 
         public void Log(string message, params object[] args)
@@ -119,8 +111,7 @@ namespace PandarosWoWLogParser
 
         public void LogError(Exception e)
         {
-            LogInternal(e.Message);
-            LogInternal(e.StackTrace);
+            LogInternal(e.Message, e.StackTrace);
  
             if (e.InnerException != null)
                 LogError(e.InnerException);
@@ -134,20 +125,11 @@ namespace PandarosWoWLogParser
             return message;
         }
 
-        private void LogInternal(string message)
+        private void LogInternal(params string[] message)
         {
-           
-            if (!string.IsNullOrEmpty(message))
-                try
-                {
-                    Console.WriteLine(message);
-                    _sw.WriteLine(message);
-                }
-                finally
-                {
+            File.AppendAllLines(_logFile, message);
 
-                }
-            RotateLogs();
+            //RotateLogs();
         }
 
         private void RotateLogs()

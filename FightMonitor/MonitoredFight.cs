@@ -40,6 +40,8 @@ namespace PandarosWoWLogParser.FightMonitor
                         allDead = val;
                         break;
                     }
+
+                combatOver = allDead;
             }
 
             // havent seen a monster

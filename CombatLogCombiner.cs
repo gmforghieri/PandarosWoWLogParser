@@ -35,7 +35,7 @@ namespace PandarosWoWLogParser
         public void ParseToEnd(string folderPath)
         {
             // key by ticks to sort later
-            Dictionary<long, InternalLogEntry> masterLog = new Dictionary<long, InternalLogEntry>();
+            Dictionary<string, Dictionary<long, InternalLogEntry>> masterLog = new Dictionary<string, Dictionary<long, InternalLogEntry>>();
             var minTime = -2000000;
             var maxTime = 2000000;
 
@@ -62,7 +62,13 @@ namespace PandarosWoWLogParser
                                 continue;
 
                             // check if event exisits already
-                            var matchedEvents = masterLog.Where(kvp => kvp.Value.Log == evt.Log && kvp.Key - evt.Time.Ticks <= maxTime && kvp.Key - evt.Time.Ticks >= minTime);
+                            if (!masterLog.TryGetValue(evt.Log, out var evtDic))
+                            {
+                                evtDic = new Dictionary<long, InternalLogEntry>();
+                                masterLog[evt.Log] = evtDic;
+                            }
+
+                            var matchedEvents = evtDic.Where(kvp => kvp.Key - evt.Time.Ticks <= maxTime && kvp.Key - evt.Time.Ticks >= minTime);
 
                             if (matchedEvents.Any())
                             {
@@ -70,11 +76,12 @@ namespace PandarosWoWLogParser
                                 continue;
                             }
 
+
                             // if two events are in the log at the exact log time, we can add a tick to make it unique
-                            while (masterLog.ContainsKey(evt.Time.Ticks))
+                            while (evtDic.ContainsKey(evt.Time.Ticks))
                                 evt.Time = evt.Time.AddTicks(1);
 
-                            masterLog[evt.Time.Ticks] = evt;
+                            evtDic[evt.Time.Ticks] = evt;
                             newEvents++;
                         }
 
@@ -84,13 +91,23 @@ namespace PandarosWoWLogParser
                 _logger.Log($"{fileToParse.Name} file had {newEvents.ToString("N")} new events and {existingEvents.ToString("N")} exisiting");
             }
 
-            FileInfo outputLog = new FileInfo(Path.Combine(folderPath, "CombinedCombatLog-" + DateTime.Now.ToString() + ".log"));
+            FileInfo outputLog = new FileInfo(Path.Combine(folderPath, "CombinedCombatLog-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".log"));
+            Dictionary<long, InternalLogEntry> newLog = new Dictionary<long, InternalLogEntry>();
+
+            foreach (var line in masterLog.Values)
+                foreach(var ts in line.Values)
+                {
+                    while (newLog.ContainsKey(ts.Time.Ticks))
+                        ts.Time = ts.Time.AddTicks(1);
+
+                    newLog[ts.Time.Ticks] = ts;
+                }
 
             using (FileStream fs = new FileStream(outputLog.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 using (StreamWriter sr = new StreamWriter(fs))
                 {
-                    foreach (var line in masterLog.OrderBy(kvp => kvp.Key).Reverse())
+                    foreach (var line in newLog.OrderBy(kvp => kvp.Key))
                     {
                         sr.WriteLine($"{line.Value.Time.ToString("MM/dd HH:mm:ss.fff")}  {line.Value.Log}");
                     }

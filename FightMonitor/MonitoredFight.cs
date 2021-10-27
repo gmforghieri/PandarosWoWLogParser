@@ -15,7 +15,7 @@ namespace PandarosWoWLogParser.FightMonitor
         public List<ICombatEvent> MonitoredFightEvents { get; set; } = new List<ICombatEvent>();
         ICombatEvent _lastKnownLog;
 
-        public bool AddEvent(ICombatEvent combatEvent, CombatState state)
+        public bool AddEvent(ICombatEvent combatEvent, ICombatState state)
         {
             MonitoredFightEvents.Add(combatEvent);
 

@@ -12,13 +12,13 @@ namespace PandarosWoWLogParser.Calculators
     {
         public Dictionary<string, List<ICalculator>> Calculators { get; set; } = new Dictionary<string, List<ICalculator>>();
         public List<ICalculator> CalculatorFlatList { get; set; } = new List<ICalculator>();
-        public CombatState State { get; set; }
+        public ICombatState State { get; set; }
         public MonitoredFight Fight { get; set; }
         Dictionary<string, int> _eventCount = new Dictionary<string, int>();
         IPandaLogger _logger;
         IStatsReporter _reporter;
 
-        public CalculatorFactory(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight)
+        public CalculatorFactory(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight)
         {
             var assem = Assembly.GetExecutingAssembly();
             _logger = logger;

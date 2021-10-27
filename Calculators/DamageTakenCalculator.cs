@@ -10,7 +10,7 @@ namespace PandarosWoWLogParser.Calculators
     {
         Dictionary<string, Dictionary<string, Dictionary<string, List<long>>>> _damageTakenByEntityFromEntity = new Dictionary<string, Dictionary<string, Dictionary<string, List<long>>>>();
 
-        public DamageTakenCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
+        public DamageTakenCalculator(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
                 {

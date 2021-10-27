@@ -39,7 +39,7 @@ namespace PandarosWoWLogParser.FightMonitor
                         MonitoredBosses[boss] = Tuple.Create(bossList.Key, zone);
         }
 
-        public bool IsMonitoredFight(ICombatEvent evnt, CombatState state)
+        public bool IsMonitoredFight(ICombatEvent evnt, ICombatState state)
         {
             if (!state.InFight && CombatEventsTriggerInFight.Contains(evnt.EventName))
             {

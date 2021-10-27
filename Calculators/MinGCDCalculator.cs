@@ -12,7 +12,7 @@ namespace PandarosWoWLogParser.Calculators
         Dictionary<string, DateTime> _spellsCast = new Dictionary<string, DateTime>();
         Dictionary<string, TimeSpan> _minTimes = new Dictionary<string, TimeSpan>();
 
-        public MinGCDCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
+        public MinGCDCalculator(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
             {

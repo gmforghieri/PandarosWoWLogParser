@@ -250,7 +250,7 @@ namespace PandarosWoWLogParser
             return filenum;
         }
 
-        public void ReportPerSecondNumbers<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, CombatState state)
+        public void ReportPerSecondNumbers<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, ICombatState state)
         {
             int i = 0;
             var ts = fight.FightEnd.Subtract(fight.FightStart);
@@ -269,7 +269,7 @@ namespace PandarosWoWLogParser
             Log("---------------------------------------------");
         }
 
-        public void Report<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, CombatState state)
+        public void Report<T>(Dictionary<T, long> stats, string name, MonitoredFight fight, ICombatState state)
         {
             if (stats.Count == 0)
                 return;
@@ -287,7 +287,7 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public void Report<T, G>(Dictionary<T, Dictionary<G, long>> stats, string name, MonitoredFight fight, CombatState state)
+        public void Report<T, G>(Dictionary<T, Dictionary<G, long>> stats, string name, MonitoredFight fight, ICombatState state)
         {
             if (stats.Count == 0)
                 return;
@@ -320,7 +320,7 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public void Report<T, G, B>(Dictionary<T, Dictionary<G, Dictionary<B, long>>> stats, string name, MonitoredFight fight, CombatState state)
+        public void Report<T, G, B>(Dictionary<T, Dictionary<G, Dictionary<B, long>>> stats, string name, MonitoredFight fight, ICombatState state)
         {
             if (stats.Count == 0)
                 return;
@@ -369,7 +369,7 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public void ReportTable(List<List<string>> table, string name, MonitoredFight fight, CombatState state, List<int> length = default(List<int>))
+        public void ReportTable(List<List<string>> table, string name, MonitoredFight fight, ICombatState state, List<int> length = default(List<int>))
         {
             if (table.Count == 0)
                 return;

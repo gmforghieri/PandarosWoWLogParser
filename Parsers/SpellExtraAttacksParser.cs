@@ -1,8 +1,5 @@
-﻿using CombatLogParser;
-using PandarosWoWLogParser.Models;
+﻿using PandarosWoWLogParser.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PandarosWoWLogParser.Parsers
 {

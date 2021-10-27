@@ -1,5 +1,4 @@
-﻿using CombatLogParser;
-
+﻿
 namespace PandarosWoWLogParser.Models
 {
     public interface ISpellAura

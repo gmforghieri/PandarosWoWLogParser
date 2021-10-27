@@ -37,7 +37,8 @@ namespace PandarosWoWLogParser
                 throw new FileNotFoundException("Combat Log not found", filepath);
 
 
-            CombatState state = new CombatState(_fightMonitorFactory, _logger, _reporter);
+            ICombatState state = new CombatState(_fightMonitorFactory, _logger);
+            ICombatState allFights = new AllCombatsState(_fightMonitorFactory, _logger, _reporter);
 
             using (FileStream fs = new FileStream(fileToParse.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
@@ -51,12 +52,14 @@ namespace PandarosWoWLogParser
                         CombatEventBase evt = ParseLine(line, out string evtStr);
 
                         state.ProcessCombatEvent(evt, evtStr);
+                        allFights.ProcessCombatEvent(evt, evtStr);
                     }
 
                 }
             }
 
             state.ParseComplete();
+            allFights.ParseComplete();
         }
 
 

@@ -1,4 +1,4 @@
-﻿namespace CombatLogParser
+﻿namespace PandarosWoWLogParser
 {
     // Combat Log type
     public enum BuffType

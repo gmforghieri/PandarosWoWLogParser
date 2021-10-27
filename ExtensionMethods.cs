@@ -1,6 +1,4 @@
-﻿using Autofac;
-using CombatLogParser;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace PandarosWoWLogParser

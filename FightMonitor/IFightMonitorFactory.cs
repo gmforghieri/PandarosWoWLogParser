@@ -9,6 +9,6 @@ namespace PandarosWoWLogParser.FightMonitor
     {
         Dictionary<string, Tuple<string, MonitoredZone>> MonitoredBosses { get; set; }
         List<MonitoredZone> MonitoredZones { get; set; }
-        bool IsMonitoredFight(ICombatEvent evnt, CombatState state);
+        bool IsMonitoredFight(ICombatEvent evnt, ICombatState state);
     }
 }

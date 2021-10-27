@@ -13,7 +13,7 @@ namespace PandarosWoWLogParser.Calculators
         Dictionary<string, long> _attacks = new Dictionary<string, long>();
         Dictionary<string, Dictionary<string, long>> _missedAttacks = new Dictionary<string, Dictionary<string, long>>();
 
-        public MissedCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
+        public MissedCalculator(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
                 {

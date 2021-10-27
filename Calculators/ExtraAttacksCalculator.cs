@@ -11,7 +11,7 @@ namespace PandarosWoWLogParser.Calculators
     {
         Dictionary<string, Dictionary<string, long>> _extraAttackCount = new Dictionary<string, Dictionary<string, long>>();
 
-        public ExtraAttacksCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
+        public ExtraAttacksCalculator(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
             {

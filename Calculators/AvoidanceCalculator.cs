@@ -13,7 +13,7 @@ namespace PandarosWoWLogParser.Calculators
         Dictionary<string, long> _attacks = new Dictionary<string, long>();
         Dictionary<string, Dictionary<string, Dictionary<MissType, long>>> _attackAvoidedByEntityFromEntity = new Dictionary<string, Dictionary<string, Dictionary<MissType, long>>>(); 
 
-        public AvoidanceCalculator(IPandaLogger logger, IStatsReporter reporter, CombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
+        public AvoidanceCalculator(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
                 {

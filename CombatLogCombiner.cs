@@ -44,6 +44,23 @@ namespace PandarosWoWLogParser
                 FileInfo fileToParse = new FileInfo(file);
                 long newEvents = 0;
                 long existingEvents = 0;
+                var timezone = TimeZoneInfo.Local;
+                var endindex = fileToParse.Name.IndexOf(']');
+                var offset = "";
+
+                if (endindex != -1)
+                {
+                    var startindex = fileToParse.Name.IndexOf('[') + 1;
+                    var tzString = fileToParse.Name.Substring(startindex, endindex - startindex);
+                    timezone = TimeZoneInfo.FindSystemTimeZoneById(tzString);
+
+                    if (timezone.BaseUtcOffset.Hours >= 0)
+                        offset += "+" + timezone.BaseUtcOffset.Hours.ToString().PadLeft(2, '0');
+                    else
+                        offset += "-" + (timezone.BaseUtcOffset.Hours * -1).ToString().PadLeft(2, '0');
+
+                    offset += ":00";
+                }
 
                 using (FileStream fs = new FileStream(fileToParse.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
@@ -56,7 +73,7 @@ namespace PandarosWoWLogParser
                             if (string.IsNullOrWhiteSpace(line))
                                 continue;
 
-                            var evt = ParseLine(line);
+                            var evt = ParseLine(line, offset, timezone);
 
                             if (evt == null)
                                 continue;
@@ -116,7 +133,7 @@ namespace PandarosWoWLogParser
         }
 
 
-        private InternalLogEntry ParseLine(string line)
+        private InternalLogEntry ParseLine(string line, string offset, TimeZoneInfo timeZoneInfo)
         {
             Regex r = new Regex(@"(\d{1,2})/(\d{1,2})\s(\d{2}):(\d{2}):(\d{2}).(\d{3})\s\s(.+)$"); //matches the date format used in the combat log
             Match m = r.Match(line);
@@ -135,7 +152,10 @@ namespace PandarosWoWLogParser
             string millisecond = collection[6].Value;
 
             string data = collection[7].Value;
-            DateTime time = new DateTime(DateTime.Now.Year, int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), int.Parse(millisecond));
+
+
+            string dt = $"{DateTime.Now.Year}-{month}-{day}T{hour}:{minute}:{second}.{millisecond.ToString().PadRight(7, '0')}{offset}";
+            DateTime time = DateTime.Parse(dt);
 
             return new InternalLogEntry(time, data);
         }

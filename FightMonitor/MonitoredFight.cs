@@ -7,7 +7,6 @@ namespace PandarosWoWLogParser.FightMonitor
 {
     public class MonitoredFight
     {
-        public MonitoredZone CurrentZone { get; set; }
         public string BossName { get; set; }
         public Dictionary<string, bool> MonsterID { get; set; } = new Dictionary<string, bool>();
         public DateTime FightStart { get; set; }
@@ -19,11 +18,23 @@ namespace PandarosWoWLogParser.FightMonitor
         {
             MonitoredFightEvents.Add(combatEvent);
 
-            if (CurrentZone.MonitoredFights[BossName].Contains(combatEvent.DestName) && !MonsterID.ContainsKey(combatEvent.DestGuid))
+            if (FightMonitorFactory.CombatEventsTriggerInFight.Contains(combatEvent.EventName))
+            {
+                if (combatEvent.DestFlags.IsNPC && !MonsterID.ContainsKey(combatEvent.DestGuid))
+                {
                     MonsterID.Add(combatEvent.DestGuid, false);
 
-            if (CurrentZone.MonitoredFights[BossName].Contains(combatEvent.SourceGuid) && !MonsterID.ContainsKey(combatEvent.SourceGuid))
-                MonsterID.Add(combatEvent.SourceGuid, false);
+                    if (!BossName.Contains(combatEvent.DestName))
+                        BossName += ", " + combatEvent.DestName;
+
+                } else if (combatEvent.SourceFlags.IsNPC && !MonsterID.ContainsKey(combatEvent.SourceGuid))
+                {
+                    MonsterID.Add(combatEvent.SourceGuid, false);
+
+                    if (!BossName.Contains(combatEvent.SourceName))
+                        BossName += ", " + combatEvent.SourceName;
+                }
+            }
 
             bool combatOver = false;
 
@@ -43,7 +54,6 @@ namespace PandarosWoWLogParser.FightMonitor
                 combatOver = allDead;
             }
 
-            // havent seen a monster
             if (_lastKnownLog != null && !MonsterID.ContainsKey(combatEvent.DestGuid) && !MonsterID.ContainsKey(combatEvent.SourceGuid))
             {
                 var ts = combatEvent.Timestamp.Subtract(_lastKnownLog.Timestamp);
@@ -51,7 +61,7 @@ namespace PandarosWoWLogParser.FightMonitor
                 if (ts.TotalSeconds > 60)
                     combatOver = true;
             }
-            else if (FightMonitorFactory.CombatEventsTriggerInFight.Contains(combatEvent.EventName))
+            else if (MonsterID.ContainsKey(combatEvent.SourceGuid) || MonsterID.ContainsKey(combatEvent.DestGuid))
                 _lastKnownLog = combatEvent;
 
             var NotMonitoredFightEvents = new List<ICombatEvent>();

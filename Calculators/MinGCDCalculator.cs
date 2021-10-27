@@ -31,7 +31,7 @@ namespace PandarosWoWLogParser.Calculators
 
                 if (_minTimes.TryGetValue(combatEvent.SourceName, out var existingTs))
                 {
-                    if (ts < existingTs)
+                    if (ts > existingTs)
                         _minTimes[combatEvent.SourceName] = ts;
                 }
                 else

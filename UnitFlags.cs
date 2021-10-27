@@ -71,5 +71,21 @@ namespace PandarosWoWLogParser
         public Reaction GetReaction { get; set; }
         public ControllerAffiliation GetControllerAffiliation { get; set; }
         public Special GetSpecial { get; set; }
+
+        public bool IsNPC
+        {
+            get
+            {
+                return GetController == UnitFlags.Controller.Npc && GetFlagType == UnitFlags.FlagType.Npc;
+            }
+        }
+
+        public bool IsPlayer
+        {
+            get
+            {
+                return GetController == UnitFlags.Controller.Player && GetFlagType == UnitFlags.FlagType.Player;
+            }
+        }
     }
 }

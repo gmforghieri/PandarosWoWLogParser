@@ -8,7 +8,7 @@ namespace PandarosWoWLogParser.Calculators
 {
     public class ShieldCalculator : BaseCalculator
     {
-        Dictionary<string, Dictionary<string, long>> _shieldGivenDoneByPlayersTotal = new Dictionary<string, Dictionary<string, long>>();
+        internal Dictionary<string, Dictionary<string, long>> _shieldGivenDoneByPlayersTotal = new Dictionary<string, Dictionary<string, long>>();
 
         private List<string> _shieldNames = new List<string>()
         {

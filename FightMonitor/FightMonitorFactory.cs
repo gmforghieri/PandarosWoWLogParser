@@ -17,53 +17,45 @@ namespace PandarosWoWLogParser.FightMonitor
             LogEvents.RANGE_DAMAGE,
             LogEvents.SPELL_MISSED,
             LogEvents.SWING_DAMAGE,
-            LogEvents.SWING_MISSED
+            LogEvents.SWING_MISSED,
+            LogEvents.UNIT_DIED
         };
-
-        public List<MonitoredZone> MonitoredZones { get; set; }
-
-        public Dictionary<string, Tuple<string, MonitoredZone>> MonitoredBosses { get; set; } = new Dictionary<string, Tuple<string, MonitoredZone>>();
 
         IPandaLogger _logger;
         IStatsReporter _reporter;
 
-        public FightMonitorFactory(List<MonitoredZone> monitoredZones, IPandaLogger logger, IStatsReporter reporter)
+        public FightMonitorFactory(IPandaLogger logger, IStatsReporter reporter)
         {
-            MonitoredZones = monitoredZones;
             _reporter = reporter;
             _logger = logger;
-
-            foreach (var zone in monitoredZones)
-                foreach (var bossList in zone.MonitoredFights)
-                    foreach (var boss in bossList.Value)
-                        MonitoredBosses[boss] = Tuple.Create(bossList.Key, zone);
         }
 
         public bool IsMonitoredFight(ICombatEvent evnt, ICombatState state)
         {
             if (!state.InFight && CombatEventsTriggerInFight.Contains(evnt.EventName))
             {
-                if (MonitoredBosses.ContainsKey(evnt.DestName))
+                string npcName = string.Empty;
+                string npcId = string.Empty;
+
+                if (evnt.SourceFlags.GetController == UnitFlags.Controller.Npc)
                 {
-                    state.InFight = true;
-                    state.CurrentFight = new MonitoredFight()
-                    {
-                        CurrentZone = MonitoredBosses[evnt.DestName].Item2,
-                        BossName = MonitoredBosses[evnt.DestName].Item1,
-                        FightStart = evnt.Timestamp,
-                        MonsterID = new Dictionary<string, bool>() { { evnt.DestName, false } }
-                    };
-                    state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state, state.CurrentFight);
+                    npcName = evnt.SourceName;
+                    npcId = evnt.SourceGuid;
                 }
-                else if (MonitoredBosses.ContainsKey(evnt.SourceName))
+                else if (evnt.DestFlags.GetController == UnitFlags.Controller.Npc)
+                {
+                    npcName = evnt.DestName;
+                    npcId = evnt.DestGuid;
+                }
+                
+                if (!string.IsNullOrEmpty(npcName))
                 {
                     state.InFight = true;
                     state.CurrentFight = new MonitoredFight()
                     {
-                        CurrentZone = MonitoredBosses[evnt.SourceName].Item2,
-                        BossName = MonitoredBosses[evnt.SourceName].Item1,
+                        BossName = npcName,
                         FightStart = evnt.Timestamp,
-                        MonsterID = new Dictionary<string, bool>() { { evnt.SourceName, false } }
+                        MonsterID = new Dictionary<string, bool>() { { npcId, false } }
                     };
                     state.CalculatorFactory = new CalculatorFactory(_logger, _reporter, state, state.CurrentFight);
                 }

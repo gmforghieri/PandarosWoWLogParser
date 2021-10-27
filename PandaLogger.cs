@@ -259,7 +259,7 @@ namespace PandarosWoWLogParser
                 return;
 
             Log("---------------------------------------------");
-            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log($"{name}: {fight.BossName}");
             Log("---------------------------------------------");
             foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
             {
@@ -278,7 +278,7 @@ namespace PandarosWoWLogParser
             var ts = fight.FightEnd.Subtract(fight.FightStart);
             var total = stats.Sum(kvp => kvp.Value);
             Log("---------------------------------------------");
-            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log($"{name}: {fight.BossName}");
             Log("---------------------------------------------");
             foreach (var kvp in stats.OrderBy(i => i.Value).Reverse())
             {
@@ -304,7 +304,7 @@ namespace PandarosWoWLogParser
             }
 
             Log("---------------------------------------------");
-            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log($"{name}: {fight.BossName}");
             Log("---------------------------------------------");
             foreach (var baseKvp in totals.OrderBy(i => i.Value).Reverse())
             {
@@ -346,7 +346,7 @@ namespace PandarosWoWLogParser
             }
 
             Log("---------------------------------------------");
-            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log($"{name}: {fight.BossName}");
             Log("---------------------------------------------");
             foreach (var baseKvp in totals.OrderBy(i => i.Value).Reverse())
             {
@@ -374,7 +374,7 @@ namespace PandarosWoWLogParser
             if (table.Count == 0)
                 return;
             Log("---------------------------------------------");
-            Log($"{name}: {fight.CurrentZone.ZoneName} - {fight.BossName}");
+            Log($"{name}: {fight.BossName}");
             Log("---------------------------------------------");
             foreach(var line in table)
             {

@@ -12,11 +12,6 @@ namespace PandarosWoWLogParser
     {
         MonitoredFight _allFights = new MonitoredFight()
         {
-            CurrentZone = new MonitoredZone()
-            {
-                ZoneName = "All",
-                MonitoredFights = new Dictionary<string, List<string>>()
-            },
             BossName = "All Fights in Log"
         };
 

@@ -48,7 +48,7 @@ namespace PandarosWoWLogParser.FightMonitor
             {
                 var ts = combatEvent.Timestamp.Subtract(_lastKnownLog.Timestamp);
 
-                if (ts.TotalSeconds > 90)
+                if (ts.TotalSeconds > 60)
                     combatOver = true;
             }
             else if (FightMonitorFactory.CombatEventsTriggerInFight.Contains(combatEvent.EventName))

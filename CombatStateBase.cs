@@ -59,11 +59,18 @@ namespace PandarosWoWLogParser
             }
         }
 
-        public virtual bool TryGetOwnerName(ICombatEvent combatEvent, out string owner)
+        public virtual bool TryGetSourceOwnerName(ICombatEvent combatEvent, out string owner)
         {
             owner = null;
             return combatEvent.SourceFlags.GetController == UnitFlags.Controller.Player &&
                 EntitytoOwnerMap.TryGetValue(combatEvent.SourceGuid, out owner);
+        }
+
+        public virtual bool TryGetDestOwnerName(ICombatEvent combatEvent, out string owner)
+        {
+            owner = null;
+            return combatEvent.DestFlags.GetController == UnitFlags.Controller.Player &&
+                EntitytoOwnerMap.TryGetValue(combatEvent.DestGuid, out owner);
         }
 
         internal virtual void ProcessCombatEventInternal(ICombatEvent combatEvent)

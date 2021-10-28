@@ -17,6 +17,7 @@ namespace PandarosWoWLogParser
 
         void ParseComplete();
         void ProcessCombatEvent(ICombatEvent combatEvent, string evtStr);
-        bool TryGetOwnerName(ICombatEvent combatEvent, out string owner);
+        bool TryGetSourceOwnerName(ICombatEvent combatEvent, out string owner);
+        bool TryGetDestOwnerName(ICombatEvent combatEvent, out string owner);
     }
 }

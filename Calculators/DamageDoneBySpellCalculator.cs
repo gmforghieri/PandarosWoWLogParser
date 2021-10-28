@@ -29,7 +29,7 @@ namespace PandarosWoWLogParser.Calculators
 
             if (combatEvent.SourceFlags.GetFlagType == UnitFlags.FlagType.Player)
                 AddDamage(combatEvent.SourceName, combatEvent, damage);
-            else if (State.TryGetOwnerName(combatEvent, out var owner))
+            else if (State.TryGetSourceOwnerName(combatEvent, out var owner))
             {
                 AddDamage(owner, combatEvent, damage);
             }

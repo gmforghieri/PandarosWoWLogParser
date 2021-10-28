@@ -30,7 +30,7 @@ namespace PandarosWoWLogParser.Calculators
             {
                 _healingDoneBySpellTotal.AddValue(spell.SpellName, damage.HealAmount);
                 _healingSpellByPlayer.AddValue(combatEvent.SourceName, spell.SpellName, damage.HealAmount);
-            } else if (State.TryGetOwnerName(combatEvent, out var owner))
+            } else if (State.TryGetSourceOwnerName(combatEvent, out var owner))
             {
                 _healingDoneBySpellTotal.AddValue(spell.SpellName, damage.HealAmount);
                 _healingSpellByPlayer.AddValue(owner, spell.SpellName, damage.HealAmount);

@@ -26,7 +26,7 @@ namespace PandarosWoWLogParser.Calculators
                 return;
             var spell = (SpellDispel)combatEvent;
 
-            if (State.TryGetOwnerName(combatEvent, out string owner))
+            if (State.TryGetSourceOwnerName(combatEvent, out string owner))
                 _Dispells.AddValue(owner, spell.SpellName, spell.ExtraSpellName, 1);
             else
                 _Dispells.AddValue(combatEvent.SourceName, spell.SpellName, spell.ExtraSpellName, 1);

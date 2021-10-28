@@ -31,7 +31,7 @@ namespace PandarosWoWLogParser.Calculators
                 _overHealingDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Overhealing);
             }
 
-            if (State.TryGetOwnerName(combatEvent, out var owner))
+            if (State.TryGetSourceOwnerName(combatEvent, out var owner))
             {
                 _healingDoneByPlayersTotal.AddValue(owner, damage.HealAmount);
                 _overHealingDoneByPlayersTotal.AddValue(owner, damage.Overhealing);

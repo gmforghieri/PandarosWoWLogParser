@@ -53,6 +53,14 @@ namespace PandarosWoWLogParser
 
                         state.ProcessCombatEvent(evt, evtStr);
                         allFights.ProcessCombatEvent(evt, evtStr);
+
+                        if (state.CurrentFight != null)
+                        {
+                            if (!allFights.CurrentFight.ChildIds.Contains(state.CurrentFight.Id))
+                                allFights.CurrentFight.ChildIds.Add(state.CurrentFight.Id);
+
+                            state.CurrentFight.ParentId = allFights.CurrentFight.Id;
+                        }
                     }
 
                 }

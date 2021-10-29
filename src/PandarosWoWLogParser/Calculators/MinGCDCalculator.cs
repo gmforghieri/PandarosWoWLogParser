@@ -48,7 +48,7 @@ namespace PandarosWoWLogParser.Calculators
             foreach (var ts in _minTimes)
                 report[ts.Key] = Convert.ToInt64(ts.Value.TotalMilliseconds);
 
-            _statsReporting.Report(report, "Min Time Between Casts in milliseconds", Fight, State);
+            _statsReporting.Report(report, "Max Time Between Casts in milliseconds", Fight, State);
         }
 
         public override void StartFight()

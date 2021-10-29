@@ -7,12 +7,15 @@ namespace PandarosWoWLogParser.FightMonitor
 {
     public class MonitoredFight
     {
+        public Guid Id { get; } = Guid.NewGuid();
         public string BossName { get; set; }
         public Dictionary<string, bool> MonsterID { get; set; } = new Dictionary<string, bool>();
         public DateTime FightStart { get; set; }
         public DateTime FightEnd { get; set; }
         public List<ICombatEvent> MonitoredFightEvents { get; set; } = new List<ICombatEvent>();
         ICombatEvent _lastKnownLog;
+        public List<Guid> ChildIds { get; set; } = new List<Guid>();
+        public Guid ParentId { get; set; }
 
         public bool AddEvent(ICombatEvent combatEvent, ICombatState state)
         {

@@ -4,13 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace PandarosWoWLogParser.Calculators
 {
     public class TotalDamageDoneCalculator : BaseCalculator
     {
         Dictionary<string, long> _damageDoneByPlayersTotal = new Dictionary<string, long>();
-
+        
         public TotalDamageDoneCalculator(IPandaLogger logger, IStatsReporter reporter, ICombatState state, MonitoredFight fight) : base(logger, reporter, state, fight)
         {
             ApplicableEvents = new List<string>()
@@ -31,7 +32,7 @@ namespace PandarosWoWLogParser.Calculators
             var damage = (IDamage)combatEvent;
 
             _damageDoneByPlayersTotal.AddValue(combatEvent.SourceName, damage.Damage);
-
+            
             if (State.TryGetSourceOwnerName(combatEvent, out var owner))
             {
                 _damageDoneByPlayersTotal.AddValue(owner, damage.Damage);

@@ -70,7 +70,7 @@ namespace PandarosWoWLogParser
         const string DOT_LOG = ".log";
         static readonly char[] dot = new char[] { '.' };
         const int LOGGER_TRY = 1000;
-        string _logFile;
+        public string _logFile;
 
         public PandaLogger(string logDir)
         {

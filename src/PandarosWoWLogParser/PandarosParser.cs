@@ -19,10 +19,6 @@ namespace PandarosWoWLogParser
     {
         public static void PandarosParserSetup(this IServiceCollection services, IPandaLogger logger, IStatsReporter statsReporter)
         {
-            //var logger = new PandaLogger(ConfigurationManager.AppSettings.Get("outputDir"));
-            var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
-
-            services.AddSingleton(monitoredZones);
             services.AddSingleton<IPandaLogger>(logger);
             services.AddSingleton<IStatsReporter>(statsReporter);
             services.AddSingleton<ICombatParser<SpellDamage>, SpellDamageParser>();
@@ -51,9 +47,6 @@ namespace PandarosWoWLogParser
 
         public static void PandarosParserSetup(this ContainerBuilder builder, IPandaLogger logger, IStatsReporter statsReporter)
         {
-            //var logger = new PandaLogger(ConfigurationManager.AppSettings.Get("outputDir"));
-            var monitoredZones = JsonConvert.DeserializeObject<List<MonitoredZone>>(File.ReadAllText("./MonitoredZones.json"));
-
             builder.RegisterInstance(logger).As<IPandaLogger>().SingleInstance();
             builder.RegisterInstance(statsReporter).As<IStatsReporter>().SingleInstance();
             builder.RegisterType<SpellDamageParser>().As<ICombatParser<SpellDamage>>().SingleInstance();
@@ -76,8 +69,6 @@ namespace PandarosWoWLogParser
             builder.RegisterType<EnchantParser>().As<ICombatParser<Enchant>>().SingleInstance();
             builder.RegisterType<SpellExtraAttacksParser>().As<ICombatParser<SpellExtraAttacks>>().SingleInstance();
             builder.RegisterType<ParserFactory>().As<IParserFactory>().SingleInstance();
-
-            builder.RegisterInstance(monitoredZones);
             builder.RegisterType<FightMonitorFactory>().As<IFightMonitorFactory>();
             builder.RegisterType<CombatLogParser>();
             builder.RegisterType<CombatLogCombiner>().SingleInstance();

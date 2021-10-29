@@ -16,6 +16,7 @@ namespace PandarosWoWLogParser
         IFightMonitorFactory _fightMonitorFactory;
         IPandaLogger _logger;
         IStatsReporter _reporter;
+        public event EventHandler<double> PctComplete;
 
         public CombatLogParser(IParserFactory parserFactory, IFightMonitorFactory fightMonitorFactory, IPandaLogger logger, IStatsReporter reporter)
         {
@@ -25,7 +26,7 @@ namespace PandarosWoWLogParser
             _reporter = reporter;
         }
 
-        public void ParseToEnd(string filepath)
+        public long ParseToEnd(string filepath)
         {
             FileInfo fileToParse;
 
@@ -37,11 +38,13 @@ namespace PandarosWoWLogParser
                 throw new FileNotFoundException("Combat Log not found", filepath);
 
 
+            long count = 0;
             ICombatState state = new CombatState(_fightMonitorFactory, _logger);
             ICombatState allFights = new AllCombatsState(_fightMonitorFactory, _logger, _reporter);
-
+           
             using (FileStream fs = new FileStream(fileToParse.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
+
                 using (StreamReader sr = new StreamReader(fs))
                 {
                     long startPos = fs.Position;
@@ -49,7 +52,21 @@ namespace PandarosWoWLogParser
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
+
+                        count++;
                         CombatEventBase evt = ParseLine(line, out string evtStr);
+                        long cur = fs.Position;
+                        long total = fs.Length;
+                        double deltaCur = cur - startPos;
+                        double deltaTotal = total - startPos;
+
+                        if (count % 1000 == 0 && PctComplete != null)
+                        {
+                            PctComplete.Invoke(this, Math.Round(100 * (deltaCur / deltaTotal)));
+                        }
+
+                        if (evt == null)
+                            continue;
 
                         state.ProcessCombatEvent(evt, evtStr);
                         allFights.ProcessCombatEvent(evt, evtStr);
@@ -68,6 +85,7 @@ namespace PandarosWoWLogParser
 
             state.ParseComplete();
             allFights.ParseComplete();
+            return count;
         }
 
 
